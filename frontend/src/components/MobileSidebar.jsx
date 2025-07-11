@@ -11,7 +11,6 @@ import { toast } from 'sonner';
 import { setAuthUser } from '@/redux/authSlice';
 import { setPosts, setSelectedPost } from '@/redux/postSlice';
 import { clearNotifications } from '@/redux/rtnSlice';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
 import CreatePost from './CreatePost';
 import { Dialog, DialogContent } from './ui/dialog';
@@ -22,10 +21,12 @@ const MobileSidebar = ({ closeSidebar }) => {
     user: store.auth.user,
     likeNotification: store.realTimeNotification.likeNotification
   }));
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [showSuggested, setShowSuggested] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false); // 👈 Add this
 
   const logoutHandler = async () => {
     try {
@@ -52,7 +53,7 @@ const MobileSidebar = ({ closeSidebar }) => {
       case 'Profile': navigate(`/profile/${user?._id}`); closeSidebar(); break;
       case 'Home': navigate('/'); closeSidebar(); break;
       case 'Messages': navigate('/chat'); closeSidebar(); break;
-      case 'Notifications': dispatch(clearNotifications()); toast.success('Notifications cleared!'); closeSidebar(); break;
+      case 'Notifications': closeSidebar(); setTimeout(() => setShowNotifications(true), 300); break; // 👈 fix
       case 'Suggested': closeSidebar(); setTimeout(() => setShowSuggested(true), 300); break;
       default: toast.info(`${textType} clicked`); closeSidebar(); break;
     }
@@ -66,40 +67,11 @@ const MobileSidebar = ({ closeSidebar }) => {
     {
       icon: (
         <div className="relative">
-          <Heart />
+          <Heart className="cursor-pointer" />
           {likeNotification.length > 0 && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button size='icon' className="rounded-full h-5 w-5 bg-violet-600 hover:bg-violet-400 absolute bottom-6 left-6">{likeNotification.length}</Button>
-              </PopoverTrigger>
-              <PopoverContent>
-                <div>
-                  <button
-                    className="text-sm border-2 border-violet-400 bg-violet-400 rounded-sm p-1 font-medium text-white hover:underline"
-                    onClick={() => dispatch(clearNotifications())}
-                  >
-                    Refresh
-                  </button>
-                  {
-                    likeNotification.length === 0 ? (
-                      <p>No new notification</p>
-                    ) : (
-                      likeNotification.map((notification) => (
-                        <div key={notification.userId} className='flex items-center gap-2 my-2'>
-                          <Avatar>
-                            <AvatarImage src={notification.userDetails?.profilePicture} />
-                            <AvatarFallback>U</AvatarFallback>
-                          </Avatar>
-                          <p className='text-sm'>
-                            <span className='font-bold'>{notification.userDetails?.username || "Deleted User"}</span> liked your post
-                          </p>
-                        </div>
-                      ))
-                    )
-                  }
-                </div>
-              </PopoverContent>
-            </Popover>
+            <span className="absolute -top-2 -right-2 bg-violet-600 text-white text-xs rounded-full px-2 py-[1px]">
+              {likeNotification.length}
+            </span>
           )}
         </div>
       ),
@@ -111,7 +83,12 @@ const MobileSidebar = ({ closeSidebar }) => {
       icon: (
         <Avatar>
           <AvatarImage src={user?.profilePicture} />
-          <AvatarFallback><img src="https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg=" alt="" /></AvatarFallback>
+          <AvatarFallback>
+            <img
+              src="https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg="
+              alt=""
+            />
+          </AvatarFallback>
         </Avatar>
       ),
       text: 'Profile',
@@ -125,6 +102,7 @@ const MobileSidebar = ({ closeSidebar }) => {
         <h1 className="text-2xl font-bold mb-4 bg-gradient-to-l from-violet-500 to-pink-500 bg-clip-text text-transparent">
           Sociova
         </h1>
+
         {sidebarItems.map((item, index) => (
           <div
             key={index}
@@ -135,8 +113,37 @@ const MobileSidebar = ({ closeSidebar }) => {
             <span className="text-base font-medium">{item.text}</span>
           </div>
         ))}
+
         <CreatePost open={open} setOpen={setOpen} />
       </div>
+
+      {/* ✅ Notifications Dialog */}
+      <Dialog open={showNotifications} onOpenChange={setShowNotifications}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto p-4 md:hidden">
+          <h2 className='text-lg font-bold mb-4'>Notifications</h2>
+          <button
+            className="text-sm border-2 border-violet-400 bg-violet-400 rounded-sm p-1 font-medium text-white hover:underline mb-3"
+            onClick={() => dispatch(clearNotifications())}
+          >
+            Clear All
+          </button>
+          {likeNotification.length === 0 ? (
+            <p className="text-gray-500 text-sm italic">No new notifications</p>
+          ) : (
+            likeNotification.map((notification) => (
+              <div key={notification.userId} className='flex items-center gap-2 my-2'>
+                <Avatar>
+                  <AvatarImage src={notification.userDetails?.profilePicture} />
+                  <AvatarFallback>U</AvatarFallback>
+                </Avatar>
+                <p className='text-sm'>
+                  <span className='font-bold'>{notification.userDetails?.username || "Deleted User"}</span> liked your post
+                </p>
+              </div>
+            ))
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Suggested Users Modal */}
       <Dialog open={showSuggested} onOpenChange={setShowSuggested}>

@@ -7,7 +7,6 @@
 ## 🌐 Live Demo
 
 🔗 [Visit Sociova](https://sociova.onrender.com)  
-*(Replace this with your actual deployed URL)*
 
 ---
 

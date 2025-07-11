@@ -13,7 +13,7 @@ const SuggestedUsers = () => {
   const handleFollowUnfollow = async (id) => {
     try {
       const { data } = await axios.post(
-        `http://localhost:8000/api/v1/user/followOrunfollow/${id}`,
+        `https://sociova.onrender.com/api/v1/user/followOrunfollow/${id}`,
         {},
         {
           withCredentials: true,

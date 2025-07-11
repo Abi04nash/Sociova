@@ -1,0 +1,74 @@
+/* Mobile Top Navbar */
+.mobile-navbar {
+  display: none;
+ background-color: rgb(232, 216, 247);
+  padding: 10px 20px;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 5px rgba(0, 0, 0, 0.4);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.logo {
+ font-size: 1.5rem;
+  font-weight: bold;
+  background: linear-gradient(to right, #8b5cf6, #ec4899);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.hamburger-icon {
+  cursor: pointer;
+}
+
+/* Fullscreen Overlay */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: none;
+  z-index: 99;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* Sliding Sidebar */
+.slide-sidebar {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 250px;
+  height: 100vh;
+ background-color: rgb(250, 249, 250);
+  padding: 20px;
+  transition: left 0.3s ease-in-out;
+  z-index: 100;
+}
+.slide-sidebar.open {
+  left: 0; /* slide in */
+}
+
+.sidebar-overlay.active .slide-sidebar {
+  left: 0;
+}
+
+.close-icon {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+}
+
+/* Show only on mobile */
+@media (max-width: 768px) {
+  .mobile-navbar {
+    display: flex;
+  }
+}

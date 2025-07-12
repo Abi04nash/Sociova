@@ -53,10 +53,10 @@
 <img width="1864" height="843" alt="Screenshot 2025-07-11 183559" src="https://github.com/user-attachments/assets/d75782c6-4ccd-4027-a150-e1bd2f24a008" />
 
 ## 📸 Mobile View
-![IMG-20250712-WA0004 1](https://github.com/user-attachments/assets/2f67ef7d-14d8-4e89-970e-5f35398f4aae)
-![IMG-20250712-WA0003 1](https://github.com/user-attachments/assets/6c60a088-1d27-4679-8533-d79ac1c36cf4)
-![IMG-20250712-WA0001 1](https://github.com/user-attachments/assets/b040604a-8bae-4048-b57e-aa35d72776be)
-![IMG-20250712-WA0002 1](https://github.com/user-attachments/assets/033f8303-55a3-419c-9f12-520ee62490e0)
+![IMG-20250712-WA0004 1](https://github.com/user-attachments/assets/2f67ef7d-14d8-4e89-970e-5f35398f4aae) ![IMG-20250712-WA0003 1](https://github.com/user-attachments/assets/6c60a088-1d27-4679-8533-d79ac1c36cf4)
+
+![IMG-20250712-WA0001 1](https://github.com/user-attachments/assets/b040604a-8bae-4048-b57e-aa35d72776be) ![IMG-20250712-WA0002 1](https://github.com/user-attachments/assets/033f8303-55a3-419c-9f12-520ee62490e0)
+
 
 
 

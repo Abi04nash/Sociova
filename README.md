@@ -18,7 +18,6 @@
 - 🧑‍🤝‍🧑 Follow/Unfollow users
 - 🔍 Search users
 - ✉️ Send and receive direct messages
-- 🧵 Messaging history with real-time updates
 - 📱 Fully responsive design (Mobile_Friendly)
 - 🔐 JWT-based Authentication
 - ☁️ Image Upload using Cloudinary

@@ -84,7 +84,7 @@ const ChatPage = () => {
                 <div className='flex flex-col'>
                   <span className='font-medium'>{suggestedUser?.username}</span>
                   <span
-                    className={`text-xs font-bold border-2 p-1 pl-2 pr-2 border-amber-400 rounded-2xl  ${
+                    className={`text-xs font-bold border-2 p-1 border-amber-400 rounded-2xl  ${
                       isOnline ? 'text-green-600 border-green-400 bg-green-100' : 'text-red-600 border-red-400 bg-red-100'
                     }`}
                   >

@@ -8,18 +8,21 @@ const MobileNavbar = () => {
 
   return (
     <>
-      <div className="mobile-navbar">
-        <h1 className="logo">Sociova</h1>
-        <Menu className="hamburger-icon" size={28} onClick={() => setShowSidebar(true)} />
-      </div>
+     <div className="mobile-navbar">
+  <h1 className="logo">Sociova</h1>
+  <Menu size={28} onClick={() => setShowSidebar(true)} />
+</div>
 
-      {/* Sidebar Slide In */}
-      <div className={`sidebar-overlay ${showSidebar ? 'active' : ''}`} onClick={() => setShowSidebar(false)}>
-        <div className="slide-sidebar" onClick={(e) => e.stopPropagation()}>
-          <X className="close-icon" size={24} onClick={() => setShowSidebar(false)} />
-          <MobileSidebar closeSidebar={() => setShowSidebar(false)} />
-        </div>
-      </div>
+<div className={`sidebar-overlay ${showSidebar ? 'active' : ''}`} onClick={() => setShowSidebar(false)}>
+  <div
+    className={`slide-sidebar ${showSidebar ? 'show' : 'hide'}`}
+    onClick={(e) => e.stopPropagation()}
+  >
+    <X size={24} className="close-icon" onClick={() => setShowSidebar(false)} />
+    <MobileSidebar closeSidebar={() => setShowSidebar(false)} />
+  </div>
+</div>
+
     </>
   );
 };

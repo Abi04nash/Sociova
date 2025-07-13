@@ -66,17 +66,17 @@ const CreatePost = ({ open, setOpen }) => {
           className="fixed inset-0 bg-black/50 z-40"
         />
         <DialogContent
-          className="max-w-md z-50"
+          className="max-w-md z-50 bg-violet-100"
           onClick={(e) => e.stopPropagation()}
         >
           <DialogHeader className='text-center font-semibold'>
-            Create New Post
+            Share New Post
           </DialogHeader>
 
-          <div className='flex gap-3 items-center'>
+          <div className='flex gap-3 items-center p-2 bg-white rounded-2xl'>
             <Avatar>
               <AvatarImage src={user?.profilePicture} alt="img" />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarFallback><img src="https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg=" alt="" /></AvatarFallback>
             </Avatar>
             <div>
               <h1 className='font-semibold text-xs'>{user?.username}</h1>
@@ -87,7 +87,7 @@ const CreatePost = ({ open, setOpen }) => {
           <Textarea
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
-            className="focus-visible:ring-transparent border-none"
+            className="focus-visible:ring-transparent border-none bg-white"
             placeholder="Write a caption..."
           />
 
@@ -99,8 +99,8 @@ const CreatePost = ({ open, setOpen }) => {
 
           <input ref={imageRef} type='file' className='hidden' onChange={fileChangeHandler} />
 
-          <Button onClick={() => imageRef.current.click()} className='w-fit mx-auto bg-[#0095F6] hover:bg-[#258bcf]'>
-            Select from computer
+          <Button onClick={() => imageRef.current.click()} className='w-fit mx-auto bg-violet-500 hover:bg-violet-300'>
+            Select from the device
           </Button>
 
           {imagePreview && (

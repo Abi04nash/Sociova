@@ -84,8 +84,8 @@ const ChatPage = () => {
                 <div className='flex flex-col'>
                   <span className='font-medium'>{suggestedUser?.username}</span>
                   <span
-                    className={`text-xs font-bold ${
-                      isOnline ? 'text-green-600' : 'text-red-600'
+                    className={`text-xs font-bold border-2 p-1 pl-2 pr-2 border-amber-400 rounded-2xl  ${
+                      isOnline ? 'text-green-600 border-green-400 bg-green-100' : 'text-red-600 border-red-400 bg-red-100'
                     }`}
                   >
                     {isOnline ? '🪴ONLINE' : '💢OFFLINE'}
@@ -148,7 +148,7 @@ const ChatPage = () => {
         <div className='hidden md:flex flex-col items-center justify-center mx-auto w-full'>
           <MessageCircleCode className='w-32 h-32 my-4' />
           <h1 className='font-medium'>Your messages</h1>
-          <span>Send a message to start a chat.</span>
+          <span >Type something to break the silence.</span>
         </div>
       )}
     </div>

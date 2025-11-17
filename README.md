@@ -12,15 +12,15 @@
 
 ## 🚀 Features
 
-- ✅ User Authentication (Register/Login/Logout)
-- 🖼️ Create, Read, Delete Posts
-- ❤️ Like and 💬 Comment on posts
-- 🧑‍🤝‍🧑 Follow/Unfollow users
-- 🔍 Search users
-- ✉️ Send and receive direct messages
-- 📱 Fully responsive design (Mobile_Friendly)
-- 🔐 JWT-based Authentication
-- ☁️ Image Upload using Cloudinary
+- User Authentication (Register/Login/Logout)
+- Create, Read, Delete Posts
+- Like and 💬 Comment on posts
+- Follow/Unfollow users
+- Search users
+- Send and receive direct messages
+- Fully responsive design (Mobile_Friendly)
+- JWT-based Authentication
+- Image Upload using Cloudinary
 
 ---
 

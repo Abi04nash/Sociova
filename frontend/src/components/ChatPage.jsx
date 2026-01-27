@@ -58,7 +58,7 @@ const ChatPage = () => {
     <div className='chat flex flex-col md:flex-row ml-0 md:ml-[16%] h-screen bg-slate-50'>
       {/* User List */}
       <section
-        className={`w-full md:w-1/4 md:block ${
+        className={`w-full md:w-1/3 md:block ${
           selectedUser && showChatMobile ? 'hidden' : 'block'
         }`}
       >

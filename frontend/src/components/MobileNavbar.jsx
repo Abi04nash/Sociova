@@ -9,8 +9,8 @@ const MobileNavbar = () => {
   return (
     <>
      <div className="mobile-navbar">
-  <h1 className="logo">Sociova</h1>
-  <Menu size={28} onClick={() => setShowSidebar(true)} />
+  <h1 className="logo">SOCIOVA</h1>
+  <Menu size={20} onClick={() => setShowSidebar(true)} />
 </div>
 
 <div className={`sidebar-overlay ${showSidebar ? 'active' : ''}`} onClick={() => setShowSidebar(false)}>

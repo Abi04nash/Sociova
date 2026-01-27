@@ -1,19 +1,19 @@
 /* Mobile Top Navbar */
 .mobile-navbar {
   display: none;
- background-color: rgb(221, 192, 247);
+ background-color: rgb(255, 255, 255);
   padding: 10px 20px;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 5px rgba(0, 0, 0, 0.4);
+  /* box-shadow: 0 4px 5px rgba(0, 0, 0, 0.4); */
   position: sticky;
   top: 0;
   z-index: 50;
 }
 
 .logo {
- font-size: 1.5rem;
-  font-weight: bold;
+ font-size: 1.3rem;
+  font-weight: 900;
   background: linear-gradient(to right, #8b5cf6, #ec4899);
   background-clip: text;
   -webkit-background-clip: text;
@@ -23,7 +23,7 @@
 }
 
 .hamburger-icon {
-  cursor: pointer;
+  cursor: pointer
 }
 
 /* Fullscreen Overlay */

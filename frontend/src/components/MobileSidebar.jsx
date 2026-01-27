@@ -26,7 +26,7 @@ const MobileSidebar = ({ closeSidebar }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [showSuggested, setShowSuggested] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false); // 👈 Add this
+  const [showNotifications, setShowNotifications] = useState(false); //  Add this
 
   const logoutHandler = async () => {
     try {
@@ -53,7 +53,7 @@ const MobileSidebar = ({ closeSidebar }) => {
       case 'Profile': navigate(`/profile/${user?._id}`); closeSidebar(); break;
       case 'Home': navigate('/'); closeSidebar(); break;
       case 'Messages': navigate('/chat'); closeSidebar(); break;
-      case 'Notifications': closeSidebar(); setTimeout(() => setShowNotifications(true), 300); break; // 👈 fix
+      case 'Notifications': closeSidebar(); setTimeout(() => setShowNotifications(true), 300); break; // fix
       case 'Suggested': closeSidebar(); setTimeout(() => setShowSuggested(true), 300); break;
       default: toast.info(`${textType} clicked`); closeSidebar(); break;
     }
@@ -99,8 +99,8 @@ const MobileSidebar = ({ closeSidebar }) => {
   return (
     <>
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-bold mb-4 bg-gradient-to-l from-violet-500 to-pink-500 bg-clip-text text-transparent">
-          Sociova
+        <h1 className="text-1xl font-extrabold mb-4 bg-gradient-to-l from-violet-500 to-pink-500 bg-clip-text text-transparent">
+          SOCIOVA
         </h1>
 
         {sidebarItems.map((item, index) => (

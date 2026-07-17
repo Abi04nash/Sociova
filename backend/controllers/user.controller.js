@@ -63,14 +63,14 @@ export const login = async (req, res) => {
                 success: false,
             });
         };
-        
+
         const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
 
         // populate each post if in the posts array
         const populatedPosts = await Promise.all(
-            user.posts.map( async (postId) => {
+            user.posts.map(async (postId) => {
                 const post = await Post.findById(postId);
-                if(post.author.equals(user._id)){
+                if (post.author.equals(user._id)) {
                     return post;
                 }
                 return null;
@@ -115,7 +115,7 @@ export const logout = async (_, res) => {
 export const getProfile = async (req, res) => {
     try {
         const userId = req.params.id;
-        let user = await User.findById(userId).populate({path:'posts', createdAt:-1}).populate('bookmarks');
+        let user = await User.findById(userId).populate({ path: 'posts', createdAt: -1 }).populate('bookmarks');
         return res.status(200).json({
             user,
             success: true
@@ -137,7 +137,11 @@ export const editProfile = async (req, res) => {
 
         if (profilePicture) {
             const fileUri = getDataUri(profilePicture);
-            cloudResponse = await cloudinary.uploader.upload(fileUri);
+            cloudResponse = await cloudinary.uploader.upload(fileUri, {
+                resource_type: "auto",
+                fetch_format: "auto",
+                quality: "auto"
+            });
         }
 
         const user = await User.findById(userId).select('-password');
@@ -189,8 +193,8 @@ export const getSuggestedUsers = async (req, res) => {
 
 export const followOrUnfollow = async (req, res) => {
     try {
-        const followKrneWala = req.id; 
-        const jiskoFollowKrunga = req.params.id; 
+        const followKrneWala = req.id;
+        const jiskoFollowKrunga = req.params.id;
         if (followKrneWala === jiskoFollowKrunga) {
             return res.status(400).json({
                 message: 'You cannot follow/unfollow yourself',

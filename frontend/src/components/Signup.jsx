@@ -14,7 +14,7 @@ const Signup = () => {
         password: ""
     });
     const [loading, setLoading] = useState(false);
-    const {user} = useSelector(store=>store.auth);
+    const { user } = useSelector(store => store.auth);
     const navigate = useNavigate();
 
     const changeEventHandler = (e) => {
@@ -23,7 +23,7 @@ const Signup = () => {
 
     const signupHandler = async (e) => {
         e.preventDefault();
-      
+
         try {
             setLoading(true);
             const res = await axios.post('https://sociova.onrender.com/api/v1/user/register', input, {
@@ -49,11 +49,11 @@ const Signup = () => {
         }
     }
 
-    useEffect(()=>{
-        if(user){
+    useEffect(() => {
+        if (user) {
             navigate("/");
         }
-    },[])
+    }, [])
 
     return (
         <div className='flex bg-slate-200 items-center w-screen h-screen justify-center'>
@@ -101,7 +101,7 @@ const Signup = () => {
                     ) : (
                         <Button type='submit'>Signup</Button>
                     )
-                 
+
                 }
                 <span className='text-center'>Already have an account? <Link to="/login" className='text-blue-600'>Login</Link></span>
             </form>

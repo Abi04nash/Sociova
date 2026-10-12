@@ -182,31 +182,31 @@ const Post = ({ post }) => {
                                     onClick={handleFollowUnfollow}
                                     variant='ghost'
                                     className={`w-full py-6 font-bold rounded-2xl transition-all duration-200 ${user?.following?.includes(post.author._id)
-                                            ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                                            : 'bg-violet-50 text-violet-600 hover:bg-violet-100'
+                                        ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                                        : 'bg-violet-50 text-violet-600 hover:bg-violet-100'
                                         }`}
                                 >
                                     {user?.following?.includes(post.author._id) ? 'Unfollow' : 'Follow'}
                                 </Button>
                             )
                         }
-                        
+
                         <Button
                             variant='ghost'
                             onClick={bookmarkHandler}
-                            className={`w-full py-6 font-bold rounded-2xl transition-all duration-200 ${isBookmarked 
-                                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
+                            className={`w-full py-6 font-bold rounded-2xl transition-all duration-200 ${isBookmarked
+                                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 : 'bg-pink-50 text-pink-600 hover:bg-pink-100'
-                            }`}
+                                }`}
                         >
                             {isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'}
                         </Button>
 
                         {
                             user && user?._id === post?.author._id && (
-                                <Button 
-                                    onClick={deletePostHandler} 
-                                    variant='ghost' 
+                                <Button
+                                    onClick={deletePostHandler}
+                                    variant='ghost'
                                     className="w-full py-6 font-bold rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200"
                                 >
                                     Delete Post
@@ -231,25 +231,25 @@ const Post = ({ post }) => {
                 <div className='flex items-center gap-4'>
                     {
                         liked ? (
-                            <FaHeart onClick={likeOrDislikeHandler} size={26} className='cursor-pointer text-pink-500 hover:text-pink-600 transition-transform active:scale-75' />
+                            <FaHeart onClick={likeOrDislikeHandler} size={26} className='cursor-pointer text-violet-500 hover:text-violet-600 transition-transform active:scale-75' />
                         ) : (
                             <FaRegHeart onClick={likeOrDislikeHandler} size={26} className='cursor-pointer text-gray-700 hover:text-gray-400 transition-transform active:scale-75' />
                         )
                     }
 
-                    <MessageCircle 
-                        size={26} 
+                    <MessageCircle
+                        size={26}
                         strokeWidth={1.5}
                         onClick={() => {
                             dispatch(setSelectedPost(post));
                             setOpen(true);
-                        }} 
-                        className='cursor-pointer text-gray-700 hover:text-gray-400 transition-transform active:scale-95' 
+                        }}
+                        className='cursor-pointer text-gray-700 hover:text-gray-400 transition-transform active:scale-95'
                     />
-                    
+
                     <Send size={26} strokeWidth={1.5} className='cursor-pointer text-gray-700 hover:text-gray-400 transition-transform active:scale-95' />
                 </div>
-                
+
                 {isBookmarked ? (
                     <Bookmark onClick={bookmarkHandler} size={26} strokeWidth={1.5} className='cursor-pointer text-violet-600 fill-violet-600 transition-transform active:scale-75' />
                 ) : (
@@ -271,11 +271,11 @@ const Post = ({ post }) => {
             {/* View Comments */}
             {
                 comment.length > 0 && (
-                    <span 
+                    <span
                         onClick={() => {
                             dispatch(setSelectedPost(post));
                             setOpen(true);
-                        }} 
+                        }}
                         className='cursor-pointer text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors px-1 block mb-3'
                     >
                         View all {comment.length} comments
@@ -295,8 +295,8 @@ const Post = ({ post }) => {
                 />
                 {
                     text && (
-                        <Button 
-                            onClick={commentHandler} 
+                        <Button
+                            onClick={commentHandler}
                             className='h-10 px-4 rounded-full bg-violet-600 hover:bg-violet-700 text-white font-semibold text-sm transition-all active:scale-95 shadow-sm'
                         >
                             Post
@@ -309,3 +309,5 @@ const Post = ({ post }) => {
 }
 
 export default Post
+
+

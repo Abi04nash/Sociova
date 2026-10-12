@@ -37,13 +37,13 @@ const MobileNavbar = () => {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Refined Close Icon */}
-          <button 
+          {/* <button 
             className="absolute top-5 right-4 z-50 p-2 bg-gray-50/80 hover:bg-gray-200 text-gray-500 hover:text-gray-800 rounded-full transition-all duration-200 active:scale-95 shadow-sm"
             onClick={() => setShowSidebar(false)}
             aria-label="Close Menu"
           >
-            {/* <X size={20} strokeWidth={2.5} /> */}
-          </button>
+            <X size={20} strokeWidth={2.5} />
+          </button> */}
           
           {/* Sidebar Content Container */}
           <div className="flex-1 overflow-y-auto w-full relative custom-scrollbar">

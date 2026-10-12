@@ -214,7 +214,10 @@ const MobileSidebar = ({ closeSidebar }) => {
           </div>
           
           <div className="overflow-y-auto p-2 custom-scrollbar flex-1 bg-slate-50/30">
-             <SuggestedUsers />
+             <SuggestedUsers onClose={() => {
+            setShowSuggested(false); 
+            if(closeSidebar) closeSidebar();
+        }}/>
           </div>
 
         </DialogContent>

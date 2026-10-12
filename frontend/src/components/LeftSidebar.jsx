@@ -12,7 +12,6 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Button } from './ui/button'
 import { clearNotifications } from '@/redux/rtnSlice';
 
-
 const LeftSidebar = ({ closeSidebar }) => {
     const navigate = useNavigate();
     const { user } = useSelector(store => store.auth);
@@ -20,6 +19,7 @@ const LeftSidebar = ({ closeSidebar }) => {
     const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
 
+    const defaultPlaceholder = "https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg=";
 
     const logoutHandler = async () => {
         try {
@@ -51,71 +51,122 @@ const LeftSidebar = ({ closeSidebar }) => {
     }
 
     const sidebarItems = [
-        { icon: <Home />, text: "Home" },
-        { icon: <Search />, text: "Search" },
-        { icon: <TrendingUp />, text: "Explore" },
-        { icon: <MessageCircle />, text: "Messages" },
-        { icon: <Heart />, text: "Notifications" },
-        { icon: <PlusSquare />, text: "Create" },
+        { icon: <Home className="w-6 h-6 stroke-[1.5]" />, text: "Home" },
+        { icon: <Search className="w-6 h-6 stroke-[1.5]" />, text: "Search" },
+        { icon: <TrendingUp className="w-6 h-6 stroke-[1.5]" />, text: "Explore" },
+        { icon: <MessageCircle className="w-6 h-6 stroke-[1.5]" />, text: "Messages" },
+        { icon: <Heart className="w-6 h-6 stroke-[1.5]" />, text: "Notifications" },
+        { icon: <PlusSquare className="w-6 h-6 stroke-[1.5]" />, text: "Create" },
         {
             icon: (
-                <Avatar>
-                    <AvatarImage src={user?.profilePicture} alt="@shadcn" />
-                    <AvatarFallback><img src="https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg=" alt="" /></AvatarFallback>
+                <Avatar className="w-7 h-7 ring-1 ring-black/5 shadow-sm">
+                    <AvatarImage src={user?.profilePicture || defaultPlaceholder} alt="profile" className="object-cover" />
+                    <AvatarFallback>
+                        <img src={defaultPlaceholder} alt="fallback" className="object-cover w-full h-full" />
+                    </AvatarFallback>
                 </Avatar>
             ),
             text: "Profile"
         },
-        { icon: <LogOut />, text: "Logout" },
+        { icon: <LogOut className="w-6 h-6 stroke-[1.5] text-red-500 group-hover:text-red-600" />, text: "Logout" },
     ]
+
     return (
-        <div className=' lefty fixed top-0 z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen'>
+        <div className='lefty fixed top-0 z-30 left-0 px-4 lg:px-6 border-r border-gray-100 w-[210px] h-screen bg-white flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)]'>
+            
+            {/* Polished Mobile Close Button */}
             {closeSidebar && (
-        <button onClick={closeSidebar} className="text-white p-2 bg-red-500">
-          Close
-        </button>
-      )}
-            <div className='flex flex-col'>
-                <h1 className='my-8 pl-3 font-extrabold text-3xl bg-gradient-to-l from-violet-500 to-pink-500 bg-clip-text text-transparent'>Sociova</h1>
-                <div>
+                <button 
+                    onClick={closeSidebar} 
+                    className="md:hidden absolute top-6 right-4 text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                    Close
+                </button>
+            )}
+
+            <div className='flex flex-col h-full'>
+                {/* Logo Section */}
+                <h1 className='my-8 pl-3 font-extrabold text-3xl bg-gradient-to-tr from-violet-600 to-pink-500 bg-clip-text text-transparent select-none cursor-pointer w-fit'>
+                    Sociova
+                </h1>
+                
+                {/* Navigation Links */}
+                <div className='flex-1 flex flex-col gap-1'>
                     {
                         sidebarItems.map((item, index) => {
+                            // Separating logout to push it to the bottom naturally
+                            const isLogout = item.text === "Logout";
+                            
                             return (
-                                <div onClick={() => sidebarHandler(item.text)} key={index} className='flex items-center gap-3 relative hover:bg-gray-100 cursor-pointer rounded-lg p-3 my-3'>
-                                    {item.icon}
-                                    <span>{item.text}</span>
+                                <div 
+                                    onClick={() => sidebarHandler(item.text)} 
+                                    key={index} 
+                                    className={`group flex items-center gap-4 relative cursor-pointer rounded-xl p-3 transition-all duration-200 
+                                        ${isLogout ? 'mt-auto mb-6 hover:bg-red-50 text-red-500' : 'hover:bg-gray-50 text-gray-800 hover:text-violet-600 font-medium'}
+                                    `}
+                                >
+                                    <div className={`transition-transform duration-200 group-hover:scale-110 ${item.text === "Profile" ? 'group-hover:scale-105' : ''}`}>
+                                        {item.icon}
+                                    </div>
+                                    <span className='text-[15px] tracking-wide'>{item.text}</span>
+                                    
+                                    {/* Notification Logic */}
                                     {
                                         item.text === "Notifications" && likeNotification.length > 0 && (
                                             <Popover>
                                                 <PopoverTrigger asChild>
-                                                    <Button size='icon' className="rounded-full h-5 w-5 bg-violet-600 hover:bg-violet-400 absolute bottom-6 left-6">{likeNotification.length}</Button>
+                                                    <Button 
+                                                        size='icon' 
+                                                        className="rounded-full h-5 w-5 bg-pink-500 hover:bg-pink-600 text-white border-2 border-white absolute top-2 left-6 text-[10px] font-bold shadow-sm transition-transform hover:scale-110"
+                                                    >
+                                                        {likeNotification.length}
+                                                    </Button>
                                                 </PopoverTrigger>
-                                                <PopoverContent>
-                                                    <div>
+                                                
+                                                <PopoverContent className="w-80 p-0 rounded-2xl shadow-xl border-gray-100 overflow-hidden bg-white" align="start" sideOffset={10}>
+                                                    <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-white/95 backdrop-blur-sm sticky top-0 z-10">
+                                                        <h3 className="font-bold text-gray-900">Notifications</h3>
                                                         <button
-                                                            className="text-sm border-2 border-violet-400 bg-violet-400 rounded-sm p-1 font-medium text-white hover:underline"
-                                                            onClick={() => dispatch(clearNotifications())}
+                                                            className="text-xs px-3 py-1.5 bg-violet-50 text-violet-600 rounded-full font-semibold hover:bg-violet-100 transition-colors"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation(); // Prevents clicking this from bubbling up
+                                                                dispatch(clearNotifications());
+                                                            }}
                                                         >
-                                                            Refresh
+                                                            Clear all
                                                         </button>
+                                                    </div>
+                                                    
+                                                    <div className="max-h-[350px] overflow-y-auto custom-scrollbar p-2">
                                                         {
-                                                            likeNotification.length === 0 ? (<p>No new notification</p>) : (
+                                                            likeNotification.length === 0 ? (
+                                                                <div className="py-8 text-center text-gray-400">
+                                                                    <Heart className="w-10 h-10 mx-auto mb-2 opacity-20" />
+                                                                    <p className="text-sm font-medium">No new notifications</p>
+                                                                </div>
+                                                            ) : (
                                                                 likeNotification.map((notification) => {
-
                                                                     if (!user || !user.username) {
                                                                         return (
-                                                                            <div key={notification.userId} className='text-sm text-gray-400 italic'>
+                                                                            <div key={notification.userId} className='p-3 text-sm text-gray-400 italic bg-gray-50 rounded-xl my-1'>
                                                                                 A deleted user liked your post
                                                                             </div>
                                                                         );
                                                                     }
                                                                     return (
-                                                                        <div key={notification.userId} className='flex items-center gap-2 my-2'>
-                                                                            <Avatar>
-                                                                                <AvatarImage src={notification.userDetails?.profilePicture} />
-                                                                                <AvatarFallback><img src="https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg=" alt="" /></AvatarFallback>
+                                                                        <div key={notification.userId} className='flex items-center gap-3 p-2 my-1 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group/notif'>
+                                                                            <Avatar className="h-10 w-10 ring-1 ring-black/5">
+                                                                                <AvatarImage src={notification.userDetails?.profilePicture || defaultPlaceholder} className="object-cover" />
+                                                                                <AvatarFallback>
+                                                                                    <img src={defaultPlaceholder} alt="fallback" className="object-cover h-full w-full" />
+                                                                                </AvatarFallback>
                                                                             </Avatar>
-                                                                            <p className='text-sm'><span className='font-bold'>{notification.userDetails?.username || "Deleted User"}</span> liked your post</p>
+                                                                            <p className='text-sm text-gray-700 leading-tight flex-1'>
+                                                                                <span className='font-bold text-gray-900 group-hover/notif:text-violet-600 transition-colors mr-1'>
+                                                                                    {notification.userDetails?.username || "Deleted User"}
+                                                                                </span> 
+                                                                                liked your post.
+                                                                            </p>
                                                                         </div>
                                                                     )
                                                                 })

@@ -22,6 +22,8 @@ const EditProfile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    const defaultPlaceholder = "https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg=";
+
     const fileChangeHandler = (e) => {
         const file = e.target.files?.[0];
         if (file) setInput({ ...input, profilePhoto: file });
@@ -67,54 +69,84 @@ const EditProfile = () => {
             setLoading(false);
         }
     }
+
     return (
-        <div className='flex max-w-2xl mx-auto pl-10 edit'>
-            <section className='flex flex-col gap-6 w-full my-8'>
-                <h1 className='font-bold text-xl'>Edit Profile</h1>
-                <div className='flex items-center justify-between bg-gray-100 rounded-xl p-4'>
-                    <div className='flex items-center gap-3'>
-                        <Avatar>
-                            <AvatarImage src={user?.profilePicture} alt="post_image" />
-                            <AvatarFallback>CN</AvatarFallback>
+        <div className='max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 w-full edit font-sans'>
+            <section className='bg-white rounded-3xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] border border-gray-100 p-6 sm:p-8 lg:p-10 my-8 flex flex-col w-full'>
+                
+                <h1 className='font-extrabold text-2xl text-gray-900 tracking-tight mb-8'>Edit Profile</h1>
+                
+                {/* Profile Photo Header Card */}
+                <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50/80 border border-gray-100 rounded-2xl p-5 mb-8 gap-4 sm:gap-0'>
+                    <div className='flex items-center gap-4 w-full sm:w-auto'>
+                        <Avatar className="h-16 w-16 shadow-sm ring-4 ring-white">
+                            <AvatarImage src={user?.profilePicture || defaultPlaceholder} alt="profile_image" className="object-cover" />
+                            <AvatarFallback>
+                                <img src={defaultPlaceholder} alt="fallback" className="object-cover h-full w-full" />
+                            </AvatarFallback>
                         </Avatar>
-                        <div>
-                            <h1 className='font-bold text-sm'>{user?.username}</h1>
-                            <span className='text-gray-600'>{user?.bio || 'Bio here...'}</span>
+                        <div className='flex flex-col min-w-0'>
+                            <h1 className='font-bold text-base text-gray-900 truncate'>{user?.username}</h1>
+                            <span className='text-gray-500 text-sm font-medium truncate max-w-[200px] sm:max-w-[300px]'>{user?.bio || 'Bio here...'}</span>
                         </div>
                     </div>
-                    <input ref={imageRef} onChange={fileChangeHandler} type='file' className='hidden' />
-                    <Button onClick={() => imageRef?.current.click()} className='bg-violet-500 h-8 hover:bg-violet-400'>Change photo</Button>
+                    <input ref={imageRef} onChange={fileChangeHandler} type='file' className='hidden' accept="image/*" />
+                    <Button 
+                        onClick={() => imageRef?.current.click()} 
+                        className='bg-white text-violet-600 border border-gray-200 hover:bg-violet-50 hover:border-violet-200 shadow-sm rounded-full px-5 h-9 font-semibold transition-all w-full sm:w-auto'
+                    >
+                        Change photo
+                    </Button>
                 </div>
-                <div>
-                    <h1 className='font-bold text-xl mb-2'>Bio</h1>
-                    <Textarea value={input.bio} onChange={(e) => setInput({ ...input, bio: e.target.value })} name='bio' className="focus-visible:ring-transparent" />
+                
+                {/* Form Fields */}
+                <div className="space-y-6">
+                    <div>
+                        <h1 className='font-semibold text-sm text-gray-700 mb-2'>Bio</h1>
+                        <Textarea 
+                            value={input.bio} 
+                            onChange={(e) => setInput({ ...input, bio: e.target.value })} 
+                            name='bio' 
+                            placeholder="Write a little bit about yourself..."
+                            className="resize-none min-h-[120px] p-4 text-base bg-gray-50/80 border border-gray-200 rounded-xl focus-visible:ring-2 focus-visible:ring-violet-200 focus-visible:bg-white focus-visible:border-violet-300 transition-all duration-200 text-gray-800 placeholder:text-gray-400" 
+                        />
+                    </div>
+                    
+                    <div>
+                        <h1 className='font-semibold text-sm text-gray-700 mb-2'>Gender</h1>
+                        <Select defaultValue={input.gender} onValueChange={selectChangeHandler}>
+                            <SelectTrigger className="w-full h-12 bg-gray-50/80 border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-200 focus:bg-white focus:border-violet-300 text-base transition-all duration-200">
+                                <SelectValue placeholder="Select a gender" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl border-gray-100 shadow-lg">
+                                <SelectGroup>
+                                    <SelectItem value="male" className="rounded-lg cursor-pointer hover:bg-gray-50 my-0.5">Male</SelectItem>
+                                    <SelectItem value="female" className="rounded-lg cursor-pointer hover:bg-gray-50 my-0.5">Female</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
-                <div>
-                    <h1 className='font-bold mb-2'>Gender</h1>
-                    <Select defaultValue={input.gender} onValueChange={selectChangeHandler}>
-                        <SelectTrigger className="w-full">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectItem value="male">Male</SelectItem>
-                                <SelectItem value="female">Female</SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className='flex justify-end'>
+                
+                {/* Actions Footer */}
+                <div className='flex justify-end mt-10 pt-6 border-t border-gray-100'>
                     {
                         loading ? (
-                            <Button className='w-fit bg-violet-500 hover:bg-violet-300'>
-                                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                            <Button className='w-full sm:w-auto rounded-full px-8 h-11 bg-violet-400 text-white font-semibold cursor-not-allowed'>
+                                <Loader2 className='mr-2 h-5 w-5 animate-spin' />
                                 Please wait
                             </Button>
                         ) : (
-                            <Button onClick={editProfileHandler} className='w-fit bg-violet-500 hover:bg-violet-400'>Submit</Button>
+                            <Button 
+                                onClick={editProfileHandler} 
+                                className='w-full sm:w-auto rounded-full px-8 h-11 bg-violet-600 hover:bg-violet-700 text-white font-bold shadow-md shadow-violet-500/20 active:scale-[0.98] transition-all'
+                            >
+                                Submit
+                            </Button>
                         )
                     }
                 </div>
+                
             </section>
         </div>
     )

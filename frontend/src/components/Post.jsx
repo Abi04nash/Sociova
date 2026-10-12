@@ -14,35 +14,26 @@ import { updateBookmarks } from '@/redux/authSlice';
 import { Badge } from './ui/badge'
 import { updateFollowing, toggleFollower } from '@/redux/authSlice';
 
-
-
 const Post = ({ post }) => {
     const [text, setText] = useState("");
     const [open, setOpen] = useState(false);
     const { user } = useSelector(store => store.auth);
     const { posts } = useSelector(store => store.post);
     const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
-    //    const [bookmarked, setBookmarked] = useState(post?.bookmarks?.includes(user?._id) || false);
-    // const [bookmarked, setBookmarked] = useState(false);
     const isBookmarked = user?.bookmarks?.includes(post._id); // ✅ stable color
     const [postLike, setPostLike] = useState(post.likes.length);
     const [comment, setComment] = useState(post.comments);
     const dispatch = useDispatch();
 
-
-
-
-
+    const defaultPlaceholder = "https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg=";
 
     if (!post.author) {
         return (
-            <div className="bg-red-100 text-red-500 p-4 rounded-xl text-center">
+            <div className="bg-gray-50 border border-gray-100 text-gray-500 p-6 rounded-3xl text-center text-sm font-medium w-full max-w-md mx-auto my-4 shadow-sm">
                 This post's author has been deleted.
             </div>
         );
     }
-
-
 
     const changeEventHandler = (e) => {
         const inputText = e.target.value;
@@ -52,9 +43,6 @@ const Post = ({ post }) => {
             setText("");
         }
     }
-
-
-
 
     const handleFollowUnfollow = async () => {
         try {
@@ -74,11 +62,6 @@ const Post = ({ post }) => {
             toast.error("Something went wrong!");
         }
     };
-
-
-
-
-
 
     const likeOrDislikeHandler = async () => {
         try {
@@ -106,7 +89,6 @@ const Post = ({ post }) => {
     }
 
     const commentHandler = async () => {
-
         try {
             const res = await axios.post(`https://sociova.onrender.com/api/v1/post/${post._id}/comment`, { text }, {
                 headers: {
@@ -146,7 +128,6 @@ const Post = ({ post }) => {
         }
     }
 
-
     const bookmarkHandler = async () => {
         try {
             const res = await axios.get(`https://sociova.onrender.com/api/v1/post/${post._id}/bookmark`, {
@@ -154,8 +135,6 @@ const Post = ({ post }) => {
             });
 
             if (res.data.success) {
-                // const updatedBookmarks = res.data.bookmarks;
-
                 // ✅ You must update user bookmarks in Redux here
                 dispatch(updateBookmarks(res.data.bookmarks));
                 toast.success(res.data.message);
@@ -165,136 +144,166 @@ const Post = ({ post }) => {
         }
     };
 
-
-
-
-
-
-
-
     return (
-        <div className=' bg-slate-100 border-2 p-2 rounded-2xl my-0 w-full max-w-sm mx-auto'>
-            <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
-                    <Avatar>
-                        <AvatarImage src={post.author?.profilePicture} alt="post_image" />
-                        <AvatarFallback><img src="https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg=" alt="" /></AvatarFallback>
+        <div className='bg-white border border-gray-100 rounded-[24px] shadow-[0_2px_15px_rgba(0,0,0,0.02)] p-4 my-6 w-full max-w-md mx-auto'>
+            {/* Header */}
+            <div className='flex items-center justify-between mb-3 px-1'>
+                <div className='flex items-center gap-3'>
+                    <Avatar className="h-10 w-10 ring-1 ring-black/5 shadow-sm">
+                        <AvatarImage src={post.author?.profilePicture || defaultPlaceholder} alt="post_image" className="object-cover" />
+                        <AvatarFallback>
+                            <img src={defaultPlaceholder} alt="fallback" className="object-cover h-full w-full" />
+                        </AvatarFallback>
                     </Avatar>
-                    {/* <h1>{post.author?.username}</h1> */}
 
-
-
-                    <div className='flex items-center gap-3'>
-                        <h1>{post.author?.username}</h1>
-                        {user?._id === post.author._id && <Badge variant="secondary" className="bg-blue-300">Author</Badge>}
+                    <div className='flex flex-col'>
+                        <div className="flex items-center gap-2">
+                            <h1 className='font-bold text-sm text-gray-900'>{post.author?.username}</h1>
+                            {user?._id === post.author._id && (
+                                <Badge variant="secondary" className="bg-violet-100 text-violet-700 hover:bg-violet-200 text-[10px] px-1.5 py-0 border-0">
+                                    Author
+                                </Badge>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-
-
+                {/* Options Menu */}
                 <Dialog>
                     <DialogTrigger asChild>
-                        <MoreHorizontal className='cursor-pointer' />
+                        <button className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-colors active:scale-95">
+                            <MoreHorizontal size={20} />
+                        </button>
                     </DialogTrigger>
-                    <DialogContent className="flex flex-col items-center text-sm text-center">
+                    <DialogContent className="max-w-xs p-3 rounded-3xl bg-white border border-gray-100 shadow-2xl flex flex-col gap-2">
                         {
                             post?.author?._id !== user?._id && (
                                 <Button
                                     onClick={handleFollowUnfollow}
                                     variant='ghost'
-                                    className={`cursor-pointer border-2 w-fit font-bold transition-all duration-200 ${user?.following?.includes(post.author._id)
-                                            ? 'bg-red-100 text-red-600 border-red-300 hover:bg-red-200'
-                                            : 'bg-purple-100 text-purple-700 border-purple-300 hover:bg-purple-200'
+                                    className={`w-full py-6 font-bold rounded-2xl transition-all duration-200 ${user?.following?.includes(post.author._id)
+                                            ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                                            : 'bg-violet-50 text-violet-600 hover:bg-violet-100'
                                         }`}
                                 >
                                     {user?.following?.includes(post.author._id) ? 'Unfollow' : 'Follow'}
                                 </Button>
                             )
                         }
-
-
-
-                        {/* <Button variant='ghost' className="cursor-pointer w-fit text-[#ED4956] font-bold">Unfollow</Button> */}
+                        
                         <Button
                             variant='ghost'
                             onClick={bookmarkHandler}
-                            className={`cursor-pointer bg-pink-100 border-2 border-pink-400 w-fit ${isBookmarked ? ' bg-red-100 border-2 border-red-400 text-red-500' : '  bg-pink-100 border-2 border-pink-400 text-[#ea32b3]'}`}
+                            className={`w-full py-6 font-bold rounded-2xl transition-all duration-200 ${isBookmarked 
+                                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
+                                : 'bg-pink-50 text-pink-600 hover:bg-pink-100'
+                            }`}
                         >
-                            {isBookmarked ? 'Remove from bookmark🗑' : 'Add to bookmark📑'}
+                            {isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'}
                         </Button>
 
-                        {/* <Button variant='ghost' className="cursor-pointer w-fit">Delete</Button> */}
                         {
-                            user && user?._id === post?.author._id && <Button onClick={deletePostHandler} variant='ghost' className=" bg-slate-100 border-gray-400 border-2 cursor-pointer text-[#f12d2d] w-fit">Delete</Button>
+                            user && user?._id === post?.author._id && (
+                                <Button 
+                                    onClick={deletePostHandler} 
+                                    variant='ghost' 
+                                    className="w-full py-6 font-bold rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200"
+                                >
+                                    Delete Post
+                                </Button>
+                            )
                         }
                     </DialogContent>
                 </Dialog>
             </div>
 
-            <img
-                className='aa rounded-2xl my-2 w-full aspect-square object-cover'
-                src={post.image}
-                alt="post_img"
-            />
-
-            <div className='flex items-center justify-between my-2'>
-                <div className='flex items-center gap-3'>
-
-                    {
-                        liked ? <FaHeart onClick={likeOrDislikeHandler} size={'24'} className='cursor-pointer text-violet-500' /> : <FaRegHeart onClick={likeOrDislikeHandler} size={'22px'} className='cursor-pointer hover:text-gray-600' />
-                    }
-
-
-                    <MessageCircle onClick={() => {
-                        dispatch(setSelectedPost(post));
-                        setOpen(true);
-                    }} className='cursor-pointer hover:text-gray-600' />
-                    <Send className='cursor-pointer hover:text-gray-600' />
-                </div>
-                {isBookmarked ? (
-                    <Bookmark onClick={bookmarkHandler} className='cursor-pointer text-violet-500' />
-                ) : (
-                    <Bookmark onClick={bookmarkHandler} className='cursor-pointer hover:text-gray-600' />
-                )}
-
-
-
+            {/* Post Image */}
+            <div className="rounded-2xl overflow-hidden border border-gray-50 bg-gray-50 shadow-sm relative group">
+                <img
+                    className='w-full aspect-square object-cover'
+                    src={post.image}
+                    alt="post_img"
+                />
             </div>
 
-            <span className='font-medium block mb-2'>{postLike} likes</span>
+            {/* Actions Bar */}
+            <div className='flex items-center justify-between my-4 px-1'>
+                <div className='flex items-center gap-4'>
+                    {
+                        liked ? (
+                            <FaHeart onClick={likeOrDislikeHandler} size={26} className='cursor-pointer text-pink-500 hover:text-pink-600 transition-transform active:scale-75' />
+                        ) : (
+                            <FaRegHeart onClick={likeOrDislikeHandler} size={26} className='cursor-pointer text-gray-700 hover:text-gray-400 transition-transform active:scale-75' />
+                        )
+                    }
 
-            <p>
-                <span className='font-medium mr-2'>{post.author?.username}</span>
-                {post.caption}
-            </p>
+                    <MessageCircle 
+                        size={26} 
+                        strokeWidth={1.5}
+                        onClick={() => {
+                            dispatch(setSelectedPost(post));
+                            setOpen(true);
+                        }} 
+                        className='cursor-pointer text-gray-700 hover:text-gray-400 transition-transform active:scale-95' 
+                    />
+                    
+                    <Send size={26} strokeWidth={1.5} className='cursor-pointer text-gray-700 hover:text-gray-400 transition-transform active:scale-95' />
+                </div>
+                
+                {isBookmarked ? (
+                    <Bookmark onClick={bookmarkHandler} size={26} strokeWidth={1.5} className='cursor-pointer text-violet-600 fill-violet-600 transition-transform active:scale-75' />
+                ) : (
+                    <Bookmark onClick={bookmarkHandler} size={26} strokeWidth={1.5} className='cursor-pointer text-gray-700 hover:text-gray-400 transition-transform active:scale-75' />
+                )}
+            </div>
 
+            {/* Likes count */}
+            <div className="px-1 mb-2">
+                <span className='font-bold text-sm text-gray-900'>{postLike} likes</span>
+            </div>
+
+            {/* Caption */}
+            <div className="px-1 mb-2 text-sm leading-relaxed">
+                <span className='font-bold text-gray-900 mr-2'>{post.author?.username}</span>
+                <span className="text-gray-800">{post.caption}</span>
+            </div>
+
+            {/* View Comments */}
             {
                 comment.length > 0 && (
-                    <span onClick={() => {
-                        dispatch(setSelectedPost(post));
-                        setOpen(true);
-                    }} className='cursor-pointer text-sm text-gray-400'>View all {comment.length} comments</span>
+                    <span 
+                        onClick={() => {
+                            dispatch(setSelectedPost(post));
+                            setOpen(true);
+                        }} 
+                        className='cursor-pointer text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors px-1 block mb-3'
+                    >
+                        View all {comment.length} comments
+                    </span>
                 )
             }
-
             <CommentDialog open={open} setOpen={setOpen} />
-            <div className='flex items-center justify-between'>
+
+            {/* Comment Input Area */}
+            <div className='flex items-center gap-2 mt-3 pt-3 border-t border-gray-100'>
                 <input
                     type="text"
                     placeholder='Add a comment...'
                     value={text}
                     onChange={changeEventHandler}
-                    className='outline-none text-sm w-full'
+                    className='flex-1 outline-none text-sm bg-gray-50/80 hover:bg-gray-100 focus:bg-white border border-transparent focus:border-gray-200 focus:ring-2 focus:ring-violet-100 rounded-full px-4 py-2.5 transition-all duration-200'
                 />
                 {
-                    text && <Button onClick={commentHandler} className='text-white bg-violet-400 font-medium cursor-pointer'>Post</Button>
+                    text && (
+                        <Button 
+                            onClick={commentHandler} 
+                            className='h-10 px-4 rounded-full bg-violet-600 hover:bg-violet-700 text-white font-semibold text-sm transition-all active:scale-95 shadow-sm'
+                        >
+                            Post
+                        </Button>
+                    )
                 }
-
             </div>
-
-
-
-
         </div>
     )
 }

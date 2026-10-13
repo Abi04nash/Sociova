@@ -62,28 +62,25 @@ const CommentDialog = ({ open, setOpen }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent 
         onInteractOutside={() => setOpen(false)} 
-        // 1. ADDED: w-[95vw] so it has a small margin on mobile, max-h-[90vh] to prevent off-screen overflow
         className="w-[95vw] md:w-full max-w-5xl p-0 flex flex-col rounded-2xl overflow-hidden border-0 shadow-2xl bg-white max-h-[90vh]"
       >
-        {/* 2. CHANGED: h-full instead of max-h-[90vh] here, let the parent constrain it */}
-        <div className='flex flex-col md:flex-row w-full h-full md:h-[650px]'>
+        {/* ✅ FIX: Changed h-full to h-[85vh]. By strictly setting the height for mobile, the box can't grow and push the typing area off-screen. */}
+        <div className='flex flex-col md:flex-row w-full h-[85vh] md:h-[650px]'>
           
           {/* Left Side: Image Content */}
-          {/* 3. ADDED: flex-shrink-0 so the image container doesn't get squished by the comments */}
           <div className='w-full md:w-1/2 bg-black/5 flex items-center justify-center relative overflow-hidden group flex-shrink-0'>
             {selectedPost?.image && (
                 <img
                     src={selectedPost?.image}
                     alt="post_img"
-                    // 4. CHANGED: h-[35vh] for a slightly better image ratio on small screens
                     className='w-full h-[35vh] md:h-full object-cover transition-transform duration-500 hover:scale-[1.02]'
                 />
             )}
           </div>
 
           {/* Right Side: Comments and Interactions */}
-          {/* 5. CHANGED: Removed h-[50vh], added flex-1 min-h-0. This allows it to perfectly fill remaining space and scroll natively! */}
-          <div className='w-full md:w-1/2 flex flex-col bg-white flex-1 min-h-0'>
+          {/* ✅ FIX: Added overflow-hidden here. This ensures the right panel stays strictly within bounds, keeping the input stuck to the bottom. */}
+          <div className='w-full md:w-1/2 flex flex-col bg-white flex-1 min-h-0 overflow-hidden'>
             
             {/* Header Section */}
             <div className='flex items-center justify-between p-4 border-b border-gray-100 bg-white sticky top-0 z-10'>
@@ -117,7 +114,7 @@ const CommentDialog = ({ open, setOpen }) => {
             </div>
             
             {/* Input Area */}
-            <div className='p-3 sm:p-4 border-t border-gray-100 bg-white'>
+            <div className='p-3 sm:p-4 border-t border-gray-100 bg-white mt-auto'>
               <div className='flex items-center gap-3 relative'>
                 <input 
                     type="text" 

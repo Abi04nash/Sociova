@@ -99,12 +99,10 @@ const MobileSidebar = ({ closeSidebar }) => {
     <>
       <div className="flex flex-col h-full bg-white px-5 py-6">
         
-        {/* ✅ FIX IS HERE: flex, items-center, and justify-between added to make them perfectly parallel */}
         <div className='mb-8 px-2 flex items-center justify-between'>
             <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-tr from-violet-600 to-pink-500 bg-clip-text text-transparent w-fit">
               Sociova
             </h1>
-            {/* The mobile close button */}
             {closeSidebar && (
               <button 
                   onClick={closeSidebar}
@@ -115,8 +113,8 @@ const MobileSidebar = ({ closeSidebar }) => {
             )}
         </div>
 
-        {/* Navigation Menu */}
-        <div className="flex-1 flex flex-col gap-1.5">
+        {/* ✅ FIX: Added overflow-y-auto and pb-6 so the menu items can be scrolled up and down */}
+        <div className="flex-1 flex flex-col gap-1.5 overflow-y-auto custom-scrollbar pb-6">
             {sidebarItems.map((item, index) => {
                 const isLogout = item.text === 'Logout';
                 
@@ -145,11 +143,10 @@ const MobileSidebar = ({ closeSidebar }) => {
         <CreatePost open={open} setOpen={setOpen} />
       </div>
 
-      {/* ✅ Notifications Dialog */}
+      {/* Notifications Dialog */}
       <Dialog open={showNotifications} onOpenChange={setShowNotifications}>
         <DialogContent className="max-h-[85vh] w-[90vw] max-w-sm p-0 overflow-hidden rounded-3xl bg-white shadow-2xl border-0 md:hidden flex flex-col">
           
-          {/* Sticky Header with Close Button */}
           <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white/95 backdrop-blur-sm sticky top-0 z-10">
             <h2 className='text-lg font-extrabold text-gray-900'>Notifications</h2>
             
@@ -169,7 +166,6 @@ const MobileSidebar = ({ closeSidebar }) => {
             </div>
           </div>
 
-          {/* Scrollable Content */}
           <div className="overflow-y-auto p-3 custom-scrollbar flex-1 bg-slate-50/30">
             {likeNotification.length === 0 ? (
                 <div className="py-10 flex flex-col items-center justify-center text-gray-400">
@@ -198,11 +194,10 @@ const MobileSidebar = ({ closeSidebar }) => {
         </DialogContent>
       </Dialog>
 
-      {/* ✅ Suggested Users Modal */}
+      {/* Suggested Users Modal */}
       <Dialog open={showSuggested} onOpenChange={setShowSuggested}>
         <DialogContent className="max-h-[85vh] w-[90vw] max-w-sm p-0 overflow-hidden rounded-3xl bg-white shadow-2xl border-0 md:hidden flex flex-col">
           
-          {/* Sticky Header with Close Button */}
           <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white/95 backdrop-blur-sm sticky top-0 z-10">
              <h2 className='text-lg font-extrabold text-gray-900'>Suggested for You</h2>
              <button 

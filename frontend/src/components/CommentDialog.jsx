@@ -62,23 +62,28 @@ const CommentDialog = ({ open, setOpen }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent 
         onInteractOutside={() => setOpen(false)} 
-        className="max-w-5xl p-0 flex flex-col rounded-2xl overflow-hidden border-0 shadow-2xl bg-white"
+        // 1. ADDED: w-[95vw] so it has a small margin on mobile, max-h-[90vh] to prevent off-screen overflow
+        className="w-[95vw] md:w-full max-w-5xl p-0 flex flex-col rounded-2xl overflow-hidden border-0 shadow-2xl bg-white max-h-[90vh]"
       >
-        <div className='flex flex-col md:flex-row w-full max-h-[90vh] md:h-[650px]'>
+        {/* 2. CHANGED: h-full instead of max-h-[90vh] here, let the parent constrain it */}
+        <div className='flex flex-col md:flex-row w-full h-full md:h-[650px]'>
           
           {/* Left Side: Image Content */}
-          <div className='w-full md:w-1/2 bg-black/5 flex items-center justify-center relative overflow-hidden group'>
+          {/* 3. ADDED: flex-shrink-0 so the image container doesn't get squished by the comments */}
+          <div className='w-full md:w-1/2 bg-black/5 flex items-center justify-center relative overflow-hidden group flex-shrink-0'>
             {selectedPost?.image && (
                 <img
                     src={selectedPost?.image}
                     alt="post_img"
-                    className='w-full h-[40vh] md:h-full object-cover transition-transform duration-500 hover:scale-[1.02]'
+                    // 4. CHANGED: h-[35vh] for a slightly better image ratio on small screens
+                    className='w-full h-[35vh] md:h-full object-cover transition-transform duration-500 hover:scale-[1.02]'
                 />
             )}
           </div>
 
           {/* Right Side: Comments and Interactions */}
-          <div className='w-full md:w-1/2 flex flex-col bg-white h-[50vh] md:h-full'>
+          {/* 5. CHANGED: Removed h-[50vh], added flex-1 min-h-0. This allows it to perfectly fill remaining space and scroll natively! */}
+          <div className='w-full md:w-1/2 flex flex-col bg-white flex-1 min-h-0'>
             
             {/* Header Section */}
             <div className='flex items-center justify-between p-4 border-b border-gray-100 bg-white sticky top-0 z-10'>
@@ -97,21 +102,6 @@ const CommentDialog = ({ open, setOpen }) => {
                    </Link>
                 </div>
               </div>
-
-              {/* Keep this commented code beautifully formatted so it's ready when you uncomment it */}
-              {/* <Dialog>
-                <DialogTrigger asChild>
-                  <MoreHorizontal className='cursor-pointer text-gray-500 hover:text-gray-800 transition-colors' />
-                </DialogTrigger>
-                <DialogContent className="flex flex-col items-center text-sm text-center p-0 overflow-hidden rounded-2xl w-80">
-                  <div className='w-full cursor-pointer p-4 border-b border-gray-100 bg-white hover:bg-gray-50 text-[#ED4956] font-bold transition-colors'>
-                    Unfollow
-                  </div>
-                  <div className='w-full cursor-pointer p-4 bg-white hover:bg-gray-50 font-medium text-gray-700 transition-colors'>
-                    Add to favorites
-                  </div>
-                </DialogContent>
-              </Dialog> */}
             </div>
 
             {/* Scrollable Comments List */}
@@ -127,7 +117,7 @@ const CommentDialog = ({ open, setOpen }) => {
             </div>
             
             {/* Input Area */}
-            <div className='p-4 border-t border-gray-100 bg-white'>
+            <div className='p-3 sm:p-4 border-t border-gray-100 bg-white'>
               <div className='flex items-center gap-3 relative'>
                 <input 
                     type="text" 

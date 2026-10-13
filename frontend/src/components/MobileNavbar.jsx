@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-// import './MobileNavbar.css'; 
+import './MobileNavbar.css'; 
 import MobileSidebar from './MobileSidebar';
 
 const MobileNavbar = () => {
@@ -10,15 +10,15 @@ const MobileNavbar = () => {
     <>
       {/* Top Navbar */}
       <div className="md:hidden flex items-center justify-between px-5 py-3.5 bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 shadow-[0_2px_15px_rgba(0,0,0,0.03)] transition-all">
-        <h1 className="font-extrabold text-2xl tracking-tight bg-gradient-to-tr from-violet-600 to-pink-500 bg-clip-text text-transparent select-none cursor-pointer">
+        <h1 className="font-extrabold ml-2 text-2xl tracking-tight bg-gradient-to-tr from-violet-600 to-pink-500 bg-clip-text text-transparent select-none cursor-pointer">
           Sociova
         </h1>
         <button 
           onClick={() => setShowSidebar(true)}
-          className="p-2 -mr-2 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-full transition-all duration-200 active:scale-95"
+          className="p-2 mr-2 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-full transition-all duration-200 active:scale-95"
           aria-label="Open Menu"
         >
-          <Menu size={26} strokeWidth={2.5} />
+          <Menu size={24} strokeWidth={2.5} />
         </button>
       </div>
 

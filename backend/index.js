@@ -6,6 +6,7 @@ import connectDB from "./utils/db.js";
 import userRoute from "./routes/user.route.js";
 import postRoute from "./routes/post.route.js";
 import messageRoute from "./routes/message.route.js";
+import storyRoute from "./routes/story.route.js";
 import { app, server } from "./Socket/socket.js";
 import path from "path";
  
@@ -18,6 +19,10 @@ const __dirname = path.resolve();
 
 
 //middlewares
+
+// Changed express middlewares to this:
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(urlencoded({ extended: true }));
@@ -36,6 +41,7 @@ app.use(cors(corsOptions));
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
 app.use("/api/v1/message", messageRoute);
+app.use("/api/v1/story", storyRoute);
 
 // for deployment
 app.use(express.static(path.join(__dirname, "/frontend/dist")));

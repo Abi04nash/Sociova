@@ -115,7 +115,7 @@ export const logout = async (_, res) => {
 export const getProfile = async (req, res) => {
     try {
         const userId = req.params.id;
-        let user = await User.findById(userId).populate({ path: 'posts', createdAt: -1 }).populate('bookmarks');
+        let user = await User.findById(userId).populate({ path: 'posts', createdAt: -1 }).populate('bookmarks').populate('followers', 'username profilePicture').populate('following', 'username profilePicture');;
         return res.status(200).json({
             user,
             success: true
@@ -230,5 +230,29 @@ export const followOrUnfollow = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
+    }
+}
+
+// search users
+export const searchUser = async (req, res) => {
+    try {
+        const keyword = req.query.keyword || "";
+        
+        if(!keyword) {
+            return res.status(200).json({ success: true, users: [] });
+        }
+
+
+        const users = await User.find({
+            username: { $regex: keyword, $options: 'i' }
+        }).select('username profilePicture');
+
+        return res.status(200).json({ 
+            success: true, 
+            users 
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: 'Server error' });
     }
 }

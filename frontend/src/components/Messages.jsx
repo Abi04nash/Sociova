@@ -5,12 +5,18 @@ import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import useGetAllMessage from '@/hooks/useGetAllMessage'
 import useGetRTM from '@/hooks/useGetRTM'
+import { Lock } from 'lucide-react' // Added icon for the restriction banner
 
 const Messages = ({ selectedUser }) => {
     useGetRTM();
     useGetAllMessage();
     const { messages } = useSelector(store => store.chat);
     const { user } = useSelector(store => store.auth);
+    
+    // --- NEW LOGIC: Check follow relationship ---
+    const isFollowing = user?.following?.includes(selectedUser?._id);
+    const isFollower = user?.followers?.includes(selectedUser?._id);
+    const canMessage = isFollowing || isFollower;
     
     return (    
         <div className='flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50/50 custom-scrollbar'>
@@ -72,6 +78,19 @@ const Messages = ({ selectedUser }) => {
                         )
                     })
                 }
+
+                {/* --- NEW: Restricted Messaging Banner --- */}
+                {!canMessage && (
+                    <div className="mt-6 p-5 bg-white border border-gray-200 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm max-w-md mx-auto">
+                        <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                            <Lock size={18} className="text-gray-500" />
+                        </div>
+                        <h3 className="font-bold text-gray-900 mb-1">Messaging Unavailable</h3>
+                        <span className="text-sm font-medium text-gray-500">
+                            You can only message users you follow or who follow you.
+                        </span>
+                    </div>
+                )}
             </div>
         </div>  
     )

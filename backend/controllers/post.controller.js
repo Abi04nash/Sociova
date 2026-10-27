@@ -6,34 +6,52 @@ import { Comment } from "../models/comment.model.js";
 import { getReceiverSocketId, io } from "../Socket/socket.js";
 
 // add a post
-
 export const addNewPost = async (req, res) => {
     try {
         const { caption } = req.body;
-        const image = req.file;
+        const file = req.file; 
         const authorId = req.id;
 
-        if (!image) return res.status(400).json({ message: 'Image required' });
+        if (!file) return res.status(400).json({ message: 'File required' });
 
-        // image upload 
-        const optimizedImageBuffer = await sharp(image.buffer)
-            .resize({ width: 800, height: 800, fit: 'inside' })
-            .toFormat('webp', { quality: 80 })
-            .toBuffer();
-        // buffer to data uri
+        let cloudResponse;
 
-        const fileUri = `data:image/webp;base64,${optimizedImageBuffer.toString('base64')}`;
-        const cloudResponse = await cloudinary.uploader.upload(fileUri, {
-            fetch_format: "auto",
-            quality: "auto"
-        });
-
+        if (file.mimetype.startsWith('video/')) {
+            // Use upload_stream for videos.
+            cloudResponse = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    { resource_type: "video" },
+                    (error, result) => {
+                        if (error) {
+                            console.log("Cloudinary Video Upload Error:", error);
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }
+                );
+                stream.end(file.buffer); 
+            });
+        } else {
+            // For images, keep using sharp optimization
+            const optimizedImageBuffer = await sharp(file.buffer)
+                .resize({ width: 800, height: 800, fit: 'inside' })
+                .toFormat('webp', { quality: 80 })
+                .toBuffer();
+            
+            const fileUri = `data:image/webp;base64,${optimizedImageBuffer.toString('base64')}`;
+            
+            cloudResponse = await cloudinary.uploader.upload(fileUri, {
+                resource_type: "image",
+            });
+        }
 
         const post = await Post.create({
             caption,
-            image: cloudResponse.secure_url,
+            image: cloudResponse.secure_url, 
             author: authorId
         });
+
         const user = await User.findById(authorId);
         if (user) {
             user.posts.push(post._id);
@@ -46,10 +64,10 @@ export const addNewPost = async (req, res) => {
             message: 'New post added',
             post,
             success: true,
-        })
-
+        });
     } catch (error) {
-        console.log(error);
+        console.log("Upload Catch Error:", error);
+        return res.status(500).json({ message: "Server error during upload" });
     }
 }
 
@@ -68,6 +86,10 @@ export const getAllPost = async (req, res) => {
                     path: 'author',
                     select: 'username profilePicture'
                 }
+            })
+            .populate({ 
+                path: 'likes', 
+                select: 'username profilePicture' 
             });
 
         const filteredPosts = posts.filter(post => post.author !== null);
@@ -105,8 +127,9 @@ export const getUserPost = async (req, res) => {
             populate: {
                 path: 'author',
                 select: 'username, profilePicture'
-            }
-        });
+            },
+        }).populate({ path: 'likes', select: 'username profilePicture' });
+
         return res.status(200).json({
             posts,
             success: true

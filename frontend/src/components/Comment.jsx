@@ -1,5 +1,6 @@
 import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { Link } from 'react-router-dom'
 
 const Comment = ({ comment }) => {
     
@@ -14,29 +15,34 @@ const Comment = ({ comment }) => {
     }
 
     return (
-        <div className='my-3 group'>
-            {/* Changed from items-center to items-start so long comments align properly with the avatar at the top */}
-            <div className='flex gap-3 items-start p-2 -ml-2 rounded-xl hover:bg-gray-50 transition-colors duration-200'>
+        <div className='flex flex-col w-full mb-3 mt-1'>
+            {/* Row 1: Profile Picture & Username (Both Clickable) */}
+            <div className='flex items-center gap-3 mb-1.5'>
+                <Link to={`/profile/${comment?.author?._id}`}>
+                    <Avatar className="h-9 w-9 ring-1 ring-black/5 hover:opacity-80 transition-opacity cursor-pointer shadow-sm">
+                        <AvatarImage 
+                            src={comment?.author?.profilePicture || defaultPlaceholder} 
+                            className="object-cover" 
+                        />
+                        <AvatarFallback>
+                            <img src={defaultPlaceholder} alt="fallback" className="object-cover h-full w-full" />
+                        </AvatarFallback>
+                    </Avatar>
+                </Link>
                 
-                <Avatar className="h-8 w-8 ring-1 ring-black/5 shadow-sm shrink-0 mt-0.5">
-                    {/* Profile photo  */}
-                    <AvatarImage src={comment?.author?.profilePicture || defaultPlaceholder} className="object-cover" />
-                    <AvatarFallback>
-                        <img src={defaultPlaceholder} alt="fallback" className="object-cover h-full w-full" />
-                    </AvatarFallback>
-                </Avatar>
-                
-                <div className="flex-1 min-w-0">
-                    <h1 className='text-sm text-gray-800 leading-relaxed break-words'>
-                        <span className='font-bold hover:underline cursor-pointer mr-1.5'>
-                            {comment?.author.username || "Deleted User"}
-                        </span>
-                        <span className='font-normal text-gray-700'>
-                            {comment?.text}
-                        </span>
-                    </h1>
+                <Link 
+                    to={`/profile/${comment?.author?._id}`} 
+                    className='font-bold text-sm text-gray-900 hover:text-violet-600 transition-colors'
+                >
+                    {comment?.author?.username}
+                </Link>
+            </div>
+
+            {/* Row 2: Comment Text (Styled as a clean bubble below the name) */}
+            <div className="ml-12 mr-4">
+                <div className="text-sm text-gray-800 leading-relaxed bg-white border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] rounded-2xl rounded-tl-sm px-4 py-2.5 inline-block max-w-full break-words">
+                    {comment?.text}
                 </div>
-                
             </div>
         </div>
     )

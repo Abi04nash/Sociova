@@ -38,7 +38,7 @@ const SuggestedUsers = ({ onClose }) => {
       </div>
 
       <div className='flex flex-col gap-1'>
-        {suggestedUsers.map((sUser) => {
+        {suggestedUsers?.map((sUser) => {
           const isFollowing = user?.following?.includes(sUser._id);
           return (
             <div key={sUser._id} className='flex items-center justify-between p-3 rounded-2xl hover:bg-gray-50 transition-colors group'>

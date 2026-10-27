@@ -11,13 +11,16 @@ import { setPosts, setSelectedPost } from '@/redux/postSlice'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Button } from './ui/button'
 import { clearNotifications } from '@/redux/rtnSlice';
+import SearchDialog from './SearchDialog';
 
 const LeftSidebar = ({ closeSidebar }) => {
     const navigate = useNavigate();
     const { user } = useSelector(store => store.auth);
+    // Even though it's called 'likeNotification', we will use it for all notifications
     const { likeNotification } = useSelector(store => store.realTimeNotification);
     const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
 
     const defaultPlaceholder = "https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg=";
 
@@ -43,7 +46,9 @@ const LeftSidebar = ({ closeSidebar }) => {
             setOpen(true);
         } else if (textType === "Profile") {
             navigate(`/profile/${user?._id}`);
-        } else if (textType === "Home") {
+        }else if (textType === "Search") {   
+            setSearchOpen(true);
+        }else if (textType === "Home") {
             navigate("/");
         } else if (textType === 'Messages') {
             navigate("/chat");
@@ -53,7 +58,6 @@ const LeftSidebar = ({ closeSidebar }) => {
     const sidebarItems = [
         { icon: <Home className="w-6 h-6 stroke-[1.5]" />, text: "Home" },
         { icon: <Search className="w-6 h-6 stroke-[1.5]" />, text: "Search" },
-        { icon: <TrendingUp className="w-6 h-6 stroke-[1.5]" />, text: "Explore" },
         { icon: <MessageCircle className="w-6 h-6 stroke-[1.5]" />, text: "Messages" },
         { icon: <Heart className="w-6 h-6 stroke-[1.5]" />, text: "Notifications" },
         { icon: <PlusSquare className="w-6 h-6 stroke-[1.5]" />, text: "Create" },
@@ -94,7 +98,6 @@ const LeftSidebar = ({ closeSidebar }) => {
                 <div className='flex-1 flex flex-col gap-1'>
                     {
                         sidebarItems.map((item, index) => {
-                            // Separating logout to push it to the bottom naturally
                             const isLogout = item.text === "Logout";
                             
                             return (
@@ -117,7 +120,7 @@ const LeftSidebar = ({ closeSidebar }) => {
                                                 <PopoverTrigger asChild>
                                                     <Button 
                                                         size='icon' 
-                                                        className="rounded-full h-5 w-5 bg-pink-500 hover:bg-pink-600 text-white border-2 border-white absolute top-2 left-6 text-[10px] font-bold shadow-sm transition-transform hover:scale-110"
+                                                        className="rounded-full h-5 w-5 bg-violet-500 hover:bg-violet-600 text-white border-2 border-white absolute top-2 left-6 text-[10px] font-bold shadow-sm transition-transform hover:scale-110"
                                                     >
                                                         {likeNotification.length}
                                                     </Button>
@@ -129,7 +132,7 @@ const LeftSidebar = ({ closeSidebar }) => {
                                                         <button
                                                             className="text-xs px-3 py-1.5 bg-violet-50 text-violet-600 rounded-full font-semibold hover:bg-violet-100 transition-colors"
                                                             onClick={(e) => {
-                                                                e.stopPropagation(); // Prevents clicking this from bubbling up
+                                                                e.stopPropagation(); 
                                                                 dispatch(clearNotifications());
                                                             }}
                                                         >
@@ -146,15 +149,21 @@ const LeftSidebar = ({ closeSidebar }) => {
                                                                 </div>
                                                             ) : (
                                                                 likeNotification.map((notification) => {
-                                                                    if (!user || !user.username) {
+                                                                    if (!notification.userDetails || !notification.userDetails.username) {
                                                                         return (
-                                                                            <div key={notification.userId} className='p-3 text-sm text-gray-400 italic bg-gray-50 rounded-xl my-1'>
-                                                                                A deleted user liked your post
+                                                                            <div key={notification.userId || Math.random()} className='p-3 text-sm text-gray-400 italic bg-gray-50 rounded-xl my-1'>
+                                                                                A deleted user interacted with you
                                                                             </div>
                                                                         );
                                                                     }
                                                                     return (
-                                                                        <div key={notification.userId} className='flex items-center gap-3 p-2 my-1 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group/notif'>
+                                                                        <div 
+                                                                            key={notification.userId || Math.random()} 
+                                                                            className='flex items-center gap-3 p-2 my-1 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group/notif'
+                                                                            onClick={() => {
+                                                                                if(notification.type === 'message') navigate('/chat');
+                                                                            }}
+                                                                        >
                                                                             <Avatar className="h-10 w-10 ring-1 ring-black/5">
                                                                                 <AvatarImage src={notification.userDetails?.profilePicture || defaultPlaceholder} className="object-cover" />
                                                                                 <AvatarFallback>
@@ -165,7 +174,8 @@ const LeftSidebar = ({ closeSidebar }) => {
                                                                                 <span className='font-bold text-gray-900 group-hover/notif:text-violet-600 transition-colors mr-1'>
                                                                                     {notification.userDetails?.username || "Deleted User"}
                                                                                 </span> 
-                                                                                liked your post.
+                                                                                {/* ✅ DYNAMIC NOTIFICATION TEXT */}
+                                                                                {notification.type === 'message' ? 'sent you a new message.' : 'liked your post.'}
                                                                             </p>
                                                                         </div>
                                                                     )
@@ -185,6 +195,7 @@ const LeftSidebar = ({ closeSidebar }) => {
             </div>
 
             <CreatePost open={open} setOpen={setOpen} />
+            <SearchDialog open={searchOpen} setOpen={setSearchOpen} />
 
         </div>
     )

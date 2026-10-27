@@ -1,9 +1,11 @@
 import React from 'react'
 import Posts from './Posts'
+import StoriesBar from './StoriesBar';
 
 const Feed = () => {
   return (
     <div className='feed-container flex-1 my-8 flex flex-col items-center pl-[20%]'>
+      <StoriesBar/>
         <Posts/>
     </div>
   )

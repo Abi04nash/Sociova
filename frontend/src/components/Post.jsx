@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react'
-// import Posts from './Posts'
+import React, { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
@@ -10,18 +9,21 @@ import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { setPosts, setSelectedPost } from '@/redux/postSlice'
-import { updateBookmarks } from '@/redux/authSlice';
+import { updateBookmarks, updateFollowing, toggleFollower } from '@/redux/authSlice';
 import { Badge } from './ui/badge'
-import { updateFollowing, toggleFollower } from '@/redux/authSlice';
+import { useNavigate } from 'react-router-dom'
 
 const Post = ({ post }) => {
+    const navigate = useNavigate();
     const [text, setText] = useState("");
     const [open, setOpen] = useState(false);
     const { user } = useSelector(store => store.auth);
     const { posts } = useSelector(store => store.post);
-    const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
-    const isBookmarked = user?.bookmarks?.includes(post._id); // ✅ stable color
-    const [postLike, setPostLike] = useState(post.likes.length);
+    
+    const isLiked = post.likes.some(like => (like._id === user?._id || like === user?._id));
+    const likesCount = post.likes.length;
+    const isBookmarked = user?.bookmarks?.includes(post._id); 
+    
     const [comment, setComment] = useState(post.comments);
     const dispatch = useDispatch();
 
@@ -65,23 +67,25 @@ const Post = ({ post }) => {
 
     const likeOrDislikeHandler = async () => {
         try {
-            const action = liked ? 'dislike' : 'like';
-            const res = await axios.get(`https://sociova.onrender.com/api/v1/post/${post._id}/${action}`, { withCredentials: true });
-            console.log(res.data);
-            if (res.data.success) {
-                const updatedLikes = liked ? postLike - 1 : postLike + 1;
-                setPostLike(updatedLikes);
-                setLiked(!liked);
+            const action = isLiked ? 'dislike' : 'like';
+            
+            const updatedPostData = posts.map(p =>
+                p._id === post._id ? {
+                    ...p,
+                    likes: isLiked 
+                        ? p.likes.filter(like => (typeof like === 'object' ? like._id : like) !== user._id) 
+                        : [...p.likes, { _id: user._id, username: user.username, profilePicture: user.profilePicture }]
+                } : p
+            );
+            
+            // The UI will update the exact millisecond you click the button
+            dispatch(setPosts(updatedPostData)); 
 
-                // apne post ko update krunga
-                const updatedPostData = posts.map(p =>
-                    p._id === post._id ? {
-                        ...p,
-                        likes: liked ? p.likes.filter(id => id !== user._id) : [...p.likes, user._id]
-                    } : p
-                );
-                dispatch(setPosts(updatedPostData));
-                toast.success(res.data.message);
+            // Now send the request to the backend in the background
+            const res = await axios.get(`https://sociova.onrender.com/api/v1/post/${post._id}/${action}`, { withCredentials: true });
+            
+            if (!res.data.success) {
+                toast.error("Failed to like post");
             }
         } catch (error) {
             console.log(error);
@@ -96,7 +100,7 @@ const Post = ({ post }) => {
                 },
                 withCredentials: true
             });
-            console.log(res.data);
+            
             if (res.data.success) {
                 const updatedCommentData = [...comment, res.data.comment];
                 setComment(updatedCommentData);
@@ -135,7 +139,6 @@ const Post = ({ post }) => {
             });
 
             if (res.data.success) {
-                // ✅ You must update user bookmarks in Redux here
                 dispatch(updateBookmarks(res.data.bookmarks));
                 toast.success(res.data.message);
             }
@@ -146,9 +149,9 @@ const Post = ({ post }) => {
 
     return (
         <div className='bg-white border border-gray-100 rounded-[24px] shadow-[0_2px_15px_rgba(0,0,0,0.02)] p-4 my-6 w-full max-w-md mx-auto'>
-            {/* Header */}
             <div className='flex items-center justify-between mb-3 px-1'>
-                <div className='flex items-center gap-3'>
+                <div className='flex items-center gap-3 cursor-pointer'
+                onClick={() => navigate(`/profile/${post.author?._id}`)}>
                     <Avatar className="h-10 w-10 ring-1 ring-black/5 shadow-sm">
                         <AvatarImage src={post.author?.profilePicture || defaultPlaceholder} alt="post_image" className="object-cover" />
                         <AvatarFallback>
@@ -175,7 +178,7 @@ const Post = ({ post }) => {
                             <MoreHorizontal size={20} />
                         </button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-xs p-3 rounded-3xl bg-white border border-gray-100 shadow-2xl flex flex-col gap-2">
+                    <DialogContent className="max-w-xs py-10 px-4 rounded-3xl bg-white border border-gray-100 shadow-2xl flex flex-col gap-2">
                         {
                             post?.author?._id !== user?._id && (
                                 <Button
@@ -217,20 +220,38 @@ const Post = ({ post }) => {
                 </Dialog>
             </div>
 
-            {/* Post Image */}
-            <div className="rounded-2xl overflow-hidden border border-gray-50 bg-gray-50 shadow-sm relative group">
-                <img
-                    className='w-full aspect-square object-cover'
-                    src={post.image}
-                    alt="post_img"
-                />
+            {/* Post Media - Renders Video or Image */}
+            <div className="rounded-2xl overflow-hidden border border-gray-100 bg-gray-900 shadow-sm relative group flex justify-center items-center aspect-square sm:aspect-[4/5]">
+                {post.image.match(/\.(mp4|mov|webm)$/i) ? (
+                    <video 
+                        src={post.image} 
+                        controls
+                        autoPlay
+                        muted
+                        loop
+                        className='relative z-10 w-full h-full object-contain'
+                    />
+                ) : (
+                    <>
+                        <img 
+                            src={post.image} 
+                            className="absolute inset-0 w-full h-full object-cover blur-xl opacity-50 scale-110" 
+                            alt="bg-blur" 
+                        />
+                        <img
+                            className='relative z-10 w-full h-full object-contain'
+                            src={post.image}
+                            alt="post_img"
+                        />
+                    </>
+                )}
             </div>
 
             {/* Actions Bar */}
             <div className='flex items-center justify-between my-4 px-1'>
                 <div className='flex items-center gap-4'>
                     {
-                        liked ? (
+                        isLiked ? (
                             <FaHeart onClick={likeOrDislikeHandler} size={26} className='cursor-pointer text-violet-500 hover:text-violet-600 transition-transform active:scale-75' />
                         ) : (
                             <FaRegHeart onClick={likeOrDislikeHandler} size={26} className='cursor-pointer text-gray-700 hover:text-gray-400 transition-transform active:scale-75' />
@@ -259,10 +280,45 @@ const Post = ({ post }) => {
 
             {/* Likes count */}
             <div className="px-1 mb-2">
-                <span className='font-bold text-sm text-gray-900'>{postLike} likes</span>
+                <Dialog>
+                    <DialogTrigger className="cursor-pointer hover:text-violet-600 transition-colors group">
+                        <span className='font-bold text-sm text-gray-900 group-hover:text-violet-600 transition-colors'>{likesCount} likes</span>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-xs sm:max-w-sm rounded-[24px] bg-white p-5 border-0 shadow-2xl">
+                        <h2 className="font-bold text-center border-b border-gray-50 pb-4 mb-2 text-gray-900 text-lg">Likes</h2>
+                        <div className="max-h-[350px] overflow-y-auto flex flex-col gap-1 p-1 custom-scrollbar">
+                            {post?.likes?.map((likeItem, index) => {
+                                const isObject = typeof likeItem === 'object';
+                                const likeId = isObject ? likeItem._id : likeItem;
+                                const likeUsername = isObject ? likeItem.username : 'User';
+                                const likeProfilePic = (isObject && likeItem.profilePicture) ? likeItem.profilePicture : defaultPlaceholder;
+
+                                return (
+                                    <div 
+                                        key={likeId || index} 
+                                        className="flex items-center justify-between p-3 rounded-2xl hover:bg-violet-50/50 hover:shadow-sm border border-transparent hover:border-violet-100 cursor-pointer transition-all group"
+                                        onClick={() => navigate(`/profile/${likeId}`)}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <Avatar className="h-12 w-12 ring-2 ring-transparent group-hover:ring-violet-200 transition-all">
+                                                <AvatarImage src={likeProfilePic} className="object-cover" />
+                                                <AvatarFallback>
+                                                    <img src={defaultPlaceholder} alt="fallback" className="object-cover h-full w-full" />
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex flex-col text-left">
+                                                <span className="font-bold text-sm text-gray-900">{likeUsername}</span>
+                                                <span className="text-xs text-gray-500 font-medium mt-0.5">View profile</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
 
-            {/* Caption */}
             <div className="px-1 mb-2 text-sm leading-relaxed">
                 <span className='font-bold text-gray-900 mr-2'>{post.author?.username}</span>
                 <span className="text-gray-800">{post.caption}</span>
@@ -284,7 +340,6 @@ const Post = ({ post }) => {
             }
             <CommentDialog open={open} setOpen={setOpen} />
 
-            {/* Comment Input Area */}
             <div className='flex items-center gap-2 mt-3 pt-3 border-t border-gray-100'>
                 <input
                     type="text"
@@ -309,5 +364,3 @@ const Post = ({ post }) => {
 }
 
 export default Post
-
-

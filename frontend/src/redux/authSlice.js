@@ -13,10 +13,9 @@ const authSlice = createSlice({
         setAuthUser: (state, action) => {
             state.user = action.payload;
         },
-        // ✅ for updating only bookmarks in user
         updateBookmarks: (state, action) => {
             if (state.user) {
-                state.user.bookmarks = action.payload; // 🔄 Update only bookmarks
+                state.user.bookmarks = action.payload; 
             }
         },
         setSuggestedUsers: (state, action) => {
@@ -29,7 +28,6 @@ const authSlice = createSlice({
             state.selectedUser = action.payload;
         },
 
-        // ✅ NEW: Add follow/unfollow toggle logic
         updateFollowing: (state, action) => {
             const targetUserId = action.payload;
 
@@ -46,19 +44,23 @@ const authSlice = createSlice({
             }
         },
         toggleFollower: (state, action) => {
-  const profileId = action.payload.loggedInUserId;
-  const targetProfile = state.userProfile;
+            const loggedInUser = action.payload; // Pass the user object now
+            const targetProfile = state.userProfile;
 
-  if (!targetProfile || !profileId) return;
+            if (!targetProfile || !loggedInUser?._id) return;
 
-  const isAlreadyFollower = targetProfile.followers.includes(profileId);
+            const isAlreadyFollower = targetProfile.followers.some(
+                (follower) => follower._id === loggedInUser._id
+            );
 
-  if (isAlreadyFollower) {
-    targetProfile.followers = targetProfile.followers.filter(id => id !== profileId);
-  } else {
-    targetProfile.followers.push(profileId);
-  }
-},
+            if (isAlreadyFollower) {
+                targetProfile.followers = targetProfile.followers.filter(
+                    (follower) => follower._id !== loggedInUser._id
+                );
+            } else {
+                targetProfile.followers.push(loggedInUser);
+            }
+        },
 
     }
 });
@@ -68,7 +70,7 @@ export const {
     setSuggestedUsers,
     setUserProfile,
     setSelectedUser,
-    updateFollowing, // ✅ Add this
-    toggleFollower, // ✅ add this
+    updateFollowing, // Added
+    toggleFollower, // Added
 } = authSlice.actions;
 export default authSlice.reducer;

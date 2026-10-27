@@ -23,10 +23,15 @@ const CreatePost = ({ open, setOpen }) => {
   const defaultPlaceholder = "https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg=";
 
   const fileChangeHandler = async (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFile(file);
-      const dataUrl = await readFileAsDataURL(file);
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      if (selectedFile.size > 50 * 1024 * 1024) {
+        toast.error("File size is too large. Please select a video under 50MB.");
+        e.target.value = ""; // Reset the input
+        return; // Stop the function here
+      }
+      setFile(selectedFile);
+      const dataUrl = await readFileAsDataURL(selectedFile);
       setImagePreview(dataUrl);
     }
   };
@@ -62,7 +67,6 @@ const CreatePost = ({ open, setOpen }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogPortal>
-        {/* Modern dark overlay with backdrop blur */}
         <div
           onClick={() => setOpen(false)}
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
@@ -71,15 +75,12 @@ const CreatePost = ({ open, setOpen }) => {
           className="max-w-lg w-[95%] sm:w-full p-0 z-50 bg-white rounded-3xl border-0 shadow-2xl overflow-hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
           <DialogHeader className='py-4 px-6 border-b border-gray-100 text-center'>
             <h2 className='font-bold text-gray-900 text-lg tracking-tight'>Share New Post</h2>
           </DialogHeader>
 
-          {/* Body Content */}
           <div className='p-5 sm:p-6 flex flex-col gap-5 max-h-[85vh] overflow-y-auto custom-scrollbar'>
             
-            {/* User Info */}
             <div className='flex gap-3 items-center'>
               <Avatar className="h-11 w-11 ring-2 ring-violet-50 shadow-sm">
                 <AvatarImage src={user?.profilePicture || defaultPlaceholder} alt="profile_img" className="object-cover" />
@@ -93,7 +94,6 @@ const CreatePost = ({ open, setOpen }) => {
               </div>
             </div>
 
-            {/* Caption Textarea */}
             <Textarea
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
@@ -101,20 +101,29 @@ const CreatePost = ({ open, setOpen }) => {
               placeholder="What's on your mind? Write a caption..."
             />
 
-            {/* Image Preview */}
             {imagePreview && (
-              <div className='w-full aspect-square sm:aspect-video rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50 relative group'>
-                <img 
-                    src={imagePreview} 
-                    alt="preview_img" 
-                    className='object-cover h-full w-full transition-transform duration-500 group-hover:scale-105' 
-                />
+              <div className='w-full aspect-square sm:aspect-video rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-black relative group flex items-center justify-center'>
+                {file?.type?.startsWith('video/') ? (
+                    <video 
+                        src={imagePreview} 
+                        controls
+                        autoPlay
+                        muted
+                        loop
+                        className='object-contain h-full w-full' 
+                    />
+                ) : (
+                    <img 
+                        src={imagePreview} 
+                        alt="preview_img" 
+                        className='object-cover h-full w-full transition-transform duration-500 group-hover:scale-105' 
+                    />
+                )}
               </div>
             )}
 
-            <input ref={imageRef} type='file' className='hidden' onChange={fileChangeHandler} accept="image/*" />
+            <input ref={imageRef} type='file' className='hidden' onChange={fileChangeHandler} accept="image/*, video/*" />
 
-            {/* Action Buttons */}
             <div className="flex flex-col gap-3 mt-2">
                 <Button 
                     onClick={() => imageRef.current.click()} 
@@ -125,7 +134,7 @@ const CreatePost = ({ open, setOpen }) => {
                         : 'bg-violet-50 text-violet-600 hover:bg-violet-100 shadow-sm'
                     }`}
                 >
-                  {imagePreview ? 'Change Selected Image' : 'Select from the device'}
+                  {imagePreview ? 'Change the Selected File' : 'Select from device'}
                 </Button>
 
                 {imagePreview && (

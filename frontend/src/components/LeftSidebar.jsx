@@ -1,4 +1,4 @@
-import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, TrendingUp } from 'lucide-react'
+import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, TrendingUp, X } from 'lucide-react'
 import React, { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { toast } from 'sonner'
@@ -8,19 +8,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setAuthUser } from '@/redux/authSlice'
 import CreatePost from './CreatePost'
 import { setPosts, setSelectedPost } from '@/redux/postSlice'
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
-import { Button } from './ui/button'
-import { clearNotifications } from '@/redux/rtnSlice';
-import SearchDialog from './SearchDialog';
+import { clearNotifications } from '@/redux/rtnSlice'
+import SearchDialog from './SearchDialog'
+import { Dialog, DialogContent } from './ui/dialog' 
 
 const LeftSidebar = ({ closeSidebar }) => {
     const navigate = useNavigate();
     const { user } = useSelector(store => store.auth);
-    // Even though it's called 'likeNotification', we will use it for all notifications
     const { likeNotification } = useSelector(store => store.realTimeNotification);
     const dispatch = useDispatch();
+    
     const [open, setOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
 
     const defaultPlaceholder = "https://media.istockphoto.com/id/1332100919/vector/man-icon-black-icon-person-symbol.jpg?s=612x612&w=0&k=20&c=AVVJkvxQQCuBhawHrUhDRTCeNQ3Jgt0K1tXjJsFy1eg=";
 
@@ -35,7 +35,7 @@ const LeftSidebar = ({ closeSidebar }) => {
                 toast.success(res.data.message);
             }
         } catch (error) {
-            toast.error(error.response.data.message);
+            toast.error(error.response?.data?.message || 'Logout failed');
         }
     }
 
@@ -46,12 +46,14 @@ const LeftSidebar = ({ closeSidebar }) => {
             setOpen(true);
         } else if (textType === "Profile") {
             navigate(`/profile/${user?._id}`);
-        }else if (textType === "Search") {   
+        } else if (textType === "Search") {   
             setSearchOpen(true);
-        }else if (textType === "Home") {
+        } else if (textType === "Home") {
             navigate("/");
         } else if (textType === 'Messages') {
             navigate("/chat");
+        } else if (textType === 'Notifications') {
+            setShowNotifications(true);
         }
     }
 
@@ -78,7 +80,6 @@ const LeftSidebar = ({ closeSidebar }) => {
     return (
         <div className='lefty fixed top-0 z-30 left-0 px-4 lg:px-6 border-r border-gray-100 w-[210px] h-screen bg-white flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)]'>
             
-            {/* Polished Mobile Close Button */}
             {closeSidebar && (
                 <button 
                     onClick={closeSidebar} 
@@ -89,12 +90,10 @@ const LeftSidebar = ({ closeSidebar }) => {
             )}
 
             <div className='flex flex-col h-full'>
-                {/* Logo Section */}
                 <h1 className='my-8 pl-3 font-extrabold text-3xl bg-gradient-to-tr from-violet-600 to-pink-500 bg-clip-text text-transparent select-none cursor-pointer w-fit'>
                     Sociova
                 </h1>
                 
-                {/* Navigation Links */}
                 <div className='flex-1 flex flex-col gap-1'>
                     {
                         sidebarItems.map((item, index) => {
@@ -104,89 +103,22 @@ const LeftSidebar = ({ closeSidebar }) => {
                                 <div 
                                     onClick={() => sidebarHandler(item.text)} 
                                     key={index} 
-                                    className={`group flex items-center gap-4 relative cursor-pointer rounded-xl p-3 transition-all duration-200 
+                                    className={`group flex items-center gap-4 cursor-pointer rounded-xl p-3 transition-all duration-200 
                                         ${isLogout ? 'mt-auto mb-6 hover:bg-red-50 text-red-500' : 'hover:bg-gray-50 text-gray-800 hover:text-violet-600 font-medium'}
                                     `}
                                 >
-                                    <div className={`transition-transform duration-200 group-hover:scale-110 ${item.text === "Profile" ? 'group-hover:scale-105' : ''}`}>
+                                    {/* ✅ FIX: Made icon container relative so the badge can perfectly overlap the top-right corner */}
+                                    <div className={`relative transition-transform duration-200 group-hover:scale-110 ${item.text === "Profile" ? 'group-hover:scale-105' : ''}`}>
                                         {item.icon}
+                                        
+                                        {item.text === "Notifications" && likeNotification.length > 0 && (
+                                            <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-violet-600 text-white text-[10px] font-extrabold rounded-full shadow-sm border-2 border-white">
+                                                {likeNotification.length}
+                                            </span>
+                                        )}
                                     </div>
-                                    <span className='text-[15px] tracking-wide'>{item.text}</span>
                                     
-                                    {/* Notification Logic */}
-                                    {
-                                        item.text === "Notifications" && likeNotification.length > 0 && (
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <Button 
-                                                        size='icon' 
-                                                        className="rounded-full h-5 w-5 bg-violet-500 hover:bg-violet-600 text-white border-2 border-white absolute top-2 left-6 text-[10px] font-bold shadow-sm transition-transform hover:scale-110"
-                                                    >
-                                                        {likeNotification.length}
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                
-                                                <PopoverContent className="w-80 p-0 rounded-2xl shadow-xl border-gray-100 overflow-hidden bg-white" align="start" sideOffset={10}>
-                                                    <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-white/95 backdrop-blur-sm sticky top-0 z-10">
-                                                        <h3 className="font-bold text-gray-900">Notifications</h3>
-                                                        <button
-                                                            className="text-xs px-3 py-1.5 bg-violet-50 text-violet-600 rounded-full font-semibold hover:bg-violet-100 transition-colors"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation(); 
-                                                                dispatch(clearNotifications());
-                                                            }}
-                                                        >
-                                                            Clear all
-                                                        </button>
-                                                    </div>
-                                                    
-                                                    <div className="max-h-[350px] overflow-y-auto custom-scrollbar p-2">
-                                                        {
-                                                            likeNotification.length === 0 ? (
-                                                                <div className="py-8 text-center text-gray-400">
-                                                                    <Heart className="w-10 h-10 mx-auto mb-2 opacity-20" />
-                                                                    <p className="text-sm font-medium">No new notifications</p>
-                                                                </div>
-                                                            ) : (
-                                                                likeNotification.map((notification) => {
-                                                                    if (!notification.userDetails || !notification.userDetails.username) {
-                                                                        return (
-                                                                            <div key={notification.userId || Math.random()} className='p-3 text-sm text-gray-400 italic bg-gray-50 rounded-xl my-1'>
-                                                                                A deleted user interacted with you
-                                                                            </div>
-                                                                        );
-                                                                    }
-                                                                    return (
-                                                                        <div 
-                                                                            key={notification.userId || Math.random()} 
-                                                                            className='flex items-center gap-3 p-2 my-1 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group/notif'
-                                                                            onClick={() => {
-                                                                                if(notification.type === 'message') navigate('/chat');
-                                                                            }}
-                                                                        >
-                                                                            <Avatar className="h-10 w-10 ring-1 ring-black/5">
-                                                                                <AvatarImage src={notification.userDetails?.profilePicture || defaultPlaceholder} className="object-cover" />
-                                                                                <AvatarFallback>
-                                                                                    <img src={defaultPlaceholder} alt="fallback" className="object-cover h-full w-full" />
-                                                                                </AvatarFallback>
-                                                                            </Avatar>
-                                                                            <p className='text-sm text-gray-700 leading-tight flex-1'>
-                                                                                <span className='font-bold text-gray-900 group-hover/notif:text-violet-600 transition-colors mr-1'>
-                                                                                    {notification.userDetails?.username || "Deleted User"}
-                                                                                </span> 
-                                                                                {/* ✅ DYNAMIC NOTIFICATION TEXT */}
-                                                                                {notification.type === 'message' ? 'sent you a new message.' : 'liked your post.'}
-                                                                            </p>
-                                                                        </div>
-                                                                    )
-                                                                })
-                                                            )
-                                                        }
-                                                    </div>
-                                                </PopoverContent>
-                                            </Popover>
-                                        )
-                                    }
+                                    <span className='text-[15px] tracking-wide'>{item.text}</span>
                                 </div>
                             )
                         })
@@ -197,8 +129,64 @@ const LeftSidebar = ({ closeSidebar }) => {
             <CreatePost open={open} setOpen={setOpen} />
             <SearchDialog open={searchOpen} setOpen={setSearchOpen} />
 
+            {/* Desktop Notifications Modal */}
+            <Dialog open={showNotifications} onOpenChange={setShowNotifications}>
+                <DialogContent className="max-h-[85vh] w-[90vw] sm:max-w-md p-0 overflow-hidden rounded-3xl bg-white shadow-2xl border-0 flex flex-col z-[100]">
+                    <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white/95 backdrop-blur-sm sticky top-0 z-10">
+                        <h2 className='text-xl font-extrabold text-gray-900'>Notifications</h2>
+                        <div className="flex items-center gap-2">
+                            <button
+                                className="text-xs px-3 py-1.5 bg-violet-50 text-violet-600 rounded-full font-semibold hover:bg-violet-100 transition-colors"
+                                onClick={() => dispatch(clearNotifications())}
+                            >
+                                Clear All
+                            </button>
+                            <button
+                                className="p-1.5 bg-gray-50 text-gray-500 hover:bg-gray-200 hover:text-gray-800 rounded-full transition-all duration-200 active:scale-95"
+                                onClick={() => setShowNotifications(false)}
+                            >
+                                <X size={18} strokeWidth={2.5} />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="overflow-y-auto p-3 custom-scrollbar flex-1 bg-slate-50/30">
+                        {likeNotification?.length === 0 ? (
+                            <div className="py-12 flex flex-col items-center justify-center text-gray-400">
+                                <Heart className="w-14 h-14 mb-4 opacity-20" />
+                                <p className="text-base font-medium">No new notifications</p>
+                                <p className="text-sm mt-1 text-gray-400 text-center px-4">When someone likes your post or messages you, it will show up here.</p>
+                            </div>
+                        ) : (
+                            likeNotification?.map((notification, i) => (
+                                <div 
+                                    key={i} 
+                                    className='flex items-center gap-3 p-3 my-1 rounded-xl bg-white border border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer'
+                                    onClick={() => {
+                                        if (notification.type === 'message') {
+                                            setShowNotifications(false);
+                                            navigate('/chat');
+                                        }
+                                    }}
+                                >
+                                    <Avatar className="h-10 w-10">
+                                        <AvatarImage src={notification.userDetails?.profilePicture || defaultPlaceholder} className="object-cover" />
+                                    </Avatar>
+                                    <p className='text-sm text-gray-700'>
+                                        <span className='font-bold text-gray-900 mr-1'>
+                                            {notification.userDetails?.username || "Deleted User"}
+                                        </span> 
+                                        {notification.type === 'message' ? 'sent you a message.' : 'liked your post.'}
+                                    </p>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
+
         </div>
     )
 }
 
-export default LeftSidebar
+export default LeftSidebar;

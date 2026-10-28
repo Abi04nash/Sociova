@@ -107,8 +107,8 @@ const MobileSidebar = ({ closeSidebar }) => {
 
   return (
     <>
-      <div className='flex flex-col h-full bg-white px-5 py-6'>
-        <div className='mb-8 px-2 flex items-center justify-between'>
+      <div className='flex flex-col h-[100dvh] max-h-screen bg-white px-5 py-6'>
+        <div className='mb-8 px-2 flex items-center justify-between shrink-0'>
           <h1 className='text-3xl font-extrabold tracking-tight bg-gradient-to-tr from-violet-600 to-pink-500 bg-clip-text text-transparent w-fit'>
             Sociova
           </h1>
@@ -122,7 +122,7 @@ const MobileSidebar = ({ closeSidebar }) => {
           )}
         </div>
 
-        <div className='flex-1 flex flex-col gap-1.5 overflow-y-auto custom-scrollbar pb-6'>
+        <div className='flex-1 flex flex-col gap-1.5 overflow-y-auto overscroll-contain custom-scrollbar pb-6'>
           {sidebarItems.map((item, index) => {
             const isLogout = item.text === 'Logout';
             return (

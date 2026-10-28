@@ -320,7 +320,7 @@ const Profile = () => {
                 <Heart size={32} className="text-gray-400" strokeWidth={1.5} />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">No Posts Yet</h2>
-              <p className="text-sm text-gray-500 font-medium text-center px-4">When you share photos, they will appear on your profile.</p>
+              <p className="text-sm text-gray-500 font-medium text-center px-4">Posts will appear on your profile.</p>
             </div>
           )}
         </div>

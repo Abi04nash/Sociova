@@ -99,9 +99,8 @@ const MobileSidebar = ({ closeSidebar }) => {
 
   return (
     <>
-      <div className='flex flex-col h-[100dvh] w-full bg-white px-5 py-6 overflow-hidden'>
+      <div className='flex flex-col h-[100dvh] w-full bg-white px-5 pt-6 pb-12 overflow-hidden'>
         
-        {/* HEADER */}
         <div className='mb-6 px-2 flex items-center justify-between shrink-0'>
           <h1 className='text-3xl font-extrabold tracking-tight bg-gradient-to-tr from-violet-600 to-pink-500 bg-clip-text text-transparent w-fit'>
             Sociova
@@ -116,47 +115,43 @@ const MobileSidebar = ({ closeSidebar }) => {
           )}
         </div>
 
-        <div className='flex-1 flex flex-col overflow-y-auto overscroll-contain custom-scrollbar pb-28'>
-          
-          <div className="flex flex-col gap-1.5">
-            {sidebarItems.map((item, index) => (
-                <div
-                  key={index}
-                  className="group flex items-center gap-4 p-3.5 rounded-2xl cursor-pointer transition-all duration-200 active:scale-[0.98] text-gray-700 hover:bg-violet-50 hover:text-violet-600"
-                  onClick={() => sidebarHandler(item.text)}
-                >
-                  <div className={`transition-transform duration-200 group-hover:scale-110 ${item.text === "Profile" ? 'group-hover:scale-105' : ''}`}>
-                    {item.icon}
-                  </div>
-                  <span className="text-[16px] tracking-wide flex-1 font-semibold">
-                    {item.text}
-                  </span>
-                  {item.text === 'Notifications' && likeNotification?.length > 0 && (
-                    <span className="bg-pink-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                      {likeNotification.length}
-                    </span>
-                  )}
+        <div className='flex-1 flex flex-col gap-1.5 overflow-y-auto overscroll-contain custom-scrollbar'>
+          {sidebarItems.map((item, index) => (
+              <div
+                key={index}
+                className="group flex items-center gap-4 p-3.5 rounded-2xl cursor-pointer transition-all duration-200 active:scale-[0.98] text-gray-700 hover:bg-violet-50 hover:text-violet-600"
+                onClick={() => sidebarHandler(item.text)}
+              >
+                <div className={`transition-transform duration-200 group-hover:scale-110 ${item.text === "Profile" ? 'group-hover:scale-105' : ''}`}>
+                  {item.icon}
                 </div>
-            ))}
-          </div>
-
-          <div className="flex-1 min-h-[2rem]"></div>
-
-          <div className='shrink-0 mt-4 pt-4 border-t border-gray-100'>
-            <div
-              className="group flex items-center gap-4 p-3.5 rounded-2xl cursor-pointer transition-all duration-200 active:scale-[0.98] bg-red-50/50 text-red-500 hover:bg-red-100 hover:text-red-600 border border-red-100"
-              onClick={logoutHandler}
-            >
-              <div className="transition-transform duration-200 group-hover:scale-110">
-                <LogOut className="w-6 h-6 stroke-[1.5]" />
+                <span className="text-[16px] tracking-wide flex-1 font-semibold">
+                  {item.text}
+                </span>
+                {item.text === 'Notifications' && likeNotification?.length > 0 && (
+                  <span className="bg-pink-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    {likeNotification.length}
+                  </span>
+                )}
               </div>
-              <span className="text-[16px] tracking-wide flex-1 font-bold">
-                Logout
-              </span>
+          ))}
+        </div>
+
+        <div className='shrink-0 mt-4 pt-4 border-t border-gray-100'>
+          <div
+            className="group flex items-center gap-4 p-3.5 rounded-2xl cursor-pointer transition-all duration-200 active:scale-[0.98] bg-red-50/50 text-red-500 hover:bg-red-100 hover:text-red-600 border border-red-100"
+            onClick={logoutHandler}
+          >
+            <div className="transition-transform duration-200 group-hover:scale-110">
+              <LogOut className="w-6 h-6 stroke-[1.5]" />
             </div>
+            <span className="text-[16px] tracking-wide flex-1 font-bold">
+              Logout
+            </span>
           </div>
         </div>
 
+        {/* Unmounted components kept entirely separate from layout logic */}
         <CreatePost open={open} setOpen={setOpen} />
         <SearchDialog open={searchOpen} setOpen={setSearchOpen} />
         <MobileRightSidebar show={showSuggestedUsers} onClose={() => setShowSuggestedUsers(false)} />

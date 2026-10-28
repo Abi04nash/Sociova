@@ -1,8 +1,10 @@
 import { Story } from "../models/story.model.js";
 import { User } from "../models/user.model.js";
 import cloudinary from "../utils/cloudinary.js";
+import sharp from "sharp";
 
 // Upload a new Story
+// Cloudinary upto 100mb for the video and for the image it is 10mb
 export const addStory = async (req, res) => {
     try {
         const file = req.file;
@@ -12,17 +14,33 @@ export const addStory = async (req, res) => {
 
         let cloudResponse;
 
-        cloudResponse = await new Promise((resolve, reject) => {
-            const resourceType = file.mimetype.startsWith('video/') ? 'video' : 'image';
-            const stream = cloudinary.uploader.upload_stream(
-                { resource_type: resourceType },
-                (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
-                }
-            );
-            stream.end(file.buffer);
-        });
+        if (file.mimetype.startsWith('video/')) {
+            cloudResponse = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    { resource_type: "video" },
+                    (error, result) => {
+                        if (error) {
+                            console.log("Cloudinary Video Error:", error);
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }
+                );
+                stream.end(file.buffer);
+            });
+        } else {
+            const optimizedImageBuffer = await sharp(file.buffer)
+                .resize({ width: 1080, height: 1920, fit: 'inside' }) 
+                .toFormat('webp', { quality: 80 })
+                .toBuffer();
+            
+            const fileUri = `data:image/webp;base64,${optimizedImageBuffer.toString('base64')}`;
+            
+            cloudResponse = await cloudinary.uploader.upload(fileUri, {
+                resource_type: "image",
+            });
+        }
 
         const story = await Story.create({
             mediaUrl: cloudResponse.secure_url,
@@ -37,7 +55,7 @@ export const addStory = async (req, res) => {
             success: true
         });
     } catch (error) {
-        console.log(error);
+        console.log("Story Upload Catch Error:", error);
         return res.status(500).json({ message: "Server error during story upload", success: false });
     }
 };
